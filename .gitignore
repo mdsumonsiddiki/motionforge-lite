@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build output
+out/
+dist/
+release/
+
+# Secrets
+.env
+.env.*
+
+# TypeScript / scratch
+*.tsbuildinfo
+.tmp/
+
+# Logs / OS
+*.log
+.DS_Store
+Thumbs.db
+
+# Local Claude Code settings
+.claude/settings.local.json

@@ -1,0 +1,11 @@
+@import 'tailwindcss';
+
+/* Dark mode is driven by a `dark` class on <html> (toggled from the theme store). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
