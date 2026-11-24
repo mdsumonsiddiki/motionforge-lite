@@ -12,7 +12,12 @@ export function newLayerId(): string {
   return `l${Date.now().toString(36)}${counter.toString(36)}`
 }
 
-export type TextStyle = { fontFamily: string; fontSize: number; color: string }
+export type TextStyle = {
+  fontFamily: string
+  fontSize: number
+  color: string
+  anchor?: { x: number; y: number }
+}
 
 /**
  * Sets the new text for an OCR box. Editing the same box again replaces its earlier layer
@@ -100,7 +105,8 @@ function isLayer(v: unknown): v is Layer {
       isStr(l.fontFamily) &&
       isNum(l.fontSize) &&
       isStr(l.color) &&
-      /^#[0-9a-f]{6}$/i.test(l.color)
+      /^#[0-9a-f]{6}$/i.test(l.color) &&
+      (l.anchor === undefined || (!!l.anchor && isNum(l.anchor.x) && isNum(l.anchor.y)))
     )
   }
   return l.kind === 'image' && isStr(l.dataUrl) && /^data:image\/(png|jpeg);base64,/.test(l.dataUrl)

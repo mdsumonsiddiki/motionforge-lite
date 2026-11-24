@@ -41,16 +41,21 @@ function getWorker(): Promise<Worker> {
 /**
  * Recognises text lines in an image.
  * @param image the image as a Blob (JPG/PNG)
+ * @param size image size in px (used to drop boxes that are too big to be a text line)
  * @param progress 0..1 while recognising
  */
-export function recognize(image: Blob, progress: (p: number) => void): Promise<OcrBox[]> {
+export function recognize(
+  image: Blob,
+  size: { width: number; height: number },
+  progress: (p: number) => void
+): Promise<OcrBox[]> {
   const job = queue.then(async () => {
     const worker = await getWorker()
     onProgress = progress
     try {
       const { data } = await worker.recognize(image, {}, { blocks: true })
       progress(1)
-      return linesToBoxes(data.blocks as unknown as OcrBlock[] | null)
+      return linesToBoxes(data.blocks as unknown as OcrBlock[] | null, size.width, size.height)
     } finally {
       onProgress = null
     }

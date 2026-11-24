@@ -1,16 +1,29 @@
-import type { Patch } from '../workers/inpaintClient'
-import type { Layer } from './types'
+import type { Layer, TextLayer } from './types'
+
+/**
+ * A removal patch ready to draw: box-sized, transparent except the old letter pixels.
+ * Drawn with drawImage (alpha-blended) — putImageData would also write the transparent
+ * pixels and punch holes into the image.
+ */
+export type DrawnPatch = { x: number; y: number; image: CanvasImageSource }
 
 /** Decoded, non-serialisable data needed to draw one document. */
 export type RenderAssets = {
   original: ImageBitmap
-  /** Inpainted patches (mask area only), keyed by OCR box id. */
-  patches: Map<string, Patch>
-  /** Boxes whose inpainting failed: their new text is drawn without removing the old. */
+  /** Removal patches, keyed by patchKey(layer). */
+  patches: Map<string, DrawnPatch>
+  /** Patch keys whose removal failed: their new text is drawn without removing the old. */
   failedPatches: Set<string>
   /** Decoded images of image layers, keyed by layer id. */
   images: Map<string, HTMLImageElement>
 }
+
+/**
+ * Cache key of a text layer's removal patch: box id + box rect. When the user adjusts a
+ * box and applies again, the rect changes, so the old patch is not reused.
+ */
+export const patchKey = (layer: Pick<TextLayer, 'boxId' | 'rect'>): string =>
+  `${layer.boxId}@${layer.rect.x},${layer.rect.y},${layer.rect.w},${layer.rect.h}`
 
 /** CSS font string for canvas text. */
 export const fontCss = (size: number, family: string): string =>
@@ -55,10 +68,9 @@ export function fitFontSize(
 /**
  * Draws the document at full resolution:
  *  1. the original
- *  2. every removal patch (old text erased)
+ *  2. every removal patch (old letters erased; all other pixels are transparent)
  *  3. layers in order: new text, user images
- * All patches go first because a patch's mask is padded beyond its box (inpaintPlan.ts);
- * drawn in layer order, a later patch could cover part of a neighbouring line's new text.
+ * All patches go first so a patch can never cover another line's new text.
  * A layer whose patch/image is still being prepared is skipped; the caller re-renders when
  * it arrives (and Save / Export wait for everything first).
  */
@@ -73,26 +85,39 @@ export function renderDocument(
 
   for (const layer of layers) {
     if (layer.kind !== 'text') continue
-    const patch = assets.patches.get(layer.boxId)
-    if (patch) ctx.putImageData(patch.image, patch.x, patch.y)
+    const patch = assets.patches.get(patchKey(layer))
+    if (patch) ctx.drawImage(patch.image, patch.x, patch.y)
   }
 
   for (const layer of layers) {
     if (layer.kind === 'text') {
       // Text waits for its patch (or for the removal to have failed).
-      if (!assets.patches.has(layer.boxId) && !assets.failedPatches.has(layer.boxId)) continue
+      const key = patchKey(layer)
+      if (!assets.patches.has(key) && !assets.failedPatches.has(key)) continue
       const lines = layer.text.split('\n')
+      const { rect, anchor } = layer
       ctx.save()
-      // Long text is drawn smaller so it stays inside the OCR box (the layer keeps its size).
-      const size = fitFontSize(lines, layer.fontSize, layer.rect, (line, s) => {
+      const measure = (line: string, s: number): number => {
         ctx.font = fontCss(s, layer.fontFamily)
         return ctx.measureText(line).width
-      })
-      const ys = lineCenters(layer.rect.y, layer.rect.h, size, lines.length)
-      ctx.font = fontCss(size, layer.fontFamily)
+      }
       ctx.fillStyle = layer.color
-      ctx.textBaseline = 'middle'
-      lines.forEach((line, i) => ctx.fillText(line, layer.rect.x, ys[i] ?? 0))
+      if (anchor && lines.length === 1) {
+        // One line: on the old text's baseline, starting where the old letters started.
+        // Only shrunk if it would run past the right edge of the box.
+        const room = { w: Math.max(1, rect.x + rect.w - anchor.x), h: Number.POSITIVE_INFINITY }
+        const size = fitFontSize(lines, layer.fontSize, room, measure)
+        ctx.font = fontCss(size, layer.fontFamily)
+        ctx.textBaseline = 'alphabetic'
+        ctx.fillText(layer.text, anchor.x, anchor.y)
+      } else {
+        // Several lines (or an old layer without anchor): centred in the box, shrunk to fit.
+        const size = fitFontSize(lines, layer.fontSize, rect, measure)
+        const ys = lineCenters(rect.y, rect.h, size, lines.length)
+        ctx.font = fontCss(size, layer.fontFamily)
+        ctx.textBaseline = 'middle'
+        lines.forEach((line, i) => ctx.fillText(line, rect.x, ys[i] ?? 0))
+      }
       ctx.restore()
     } else {
       const img = assets.images.get(layer.id)

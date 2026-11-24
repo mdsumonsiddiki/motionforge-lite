@@ -11,11 +11,20 @@ import {
   MIN_LAYER_SIZE,
   type Handle
 } from '../../editor/geometry'
-import type { Layer, Rect } from '../../editor/types'
+import { isUncertain } from '../../editor/ocrBoxes'
+import type { Layer, OcrBox, Rect } from '../../editor/types'
 
 type Drag =
   | { kind: 'move' | Handle; layerId: string; startX: number; startY: number; startRect: Rect }
+  | { kind: 'box-move' | `box-${Handle}`; boxId: string; startX: number; startY: number; startRect: Rect }
   | { kind: 'area'; startX: number; startY: number }
+
+/** New rect of a dragged rect: moved, or resized by one corner. */
+function dragRect(start: Rect, op: 'move' | Handle, dx: number, dy: number): Rect {
+  return op === 'move'
+    ? { ...start, x: Math.round(start.x + dx), y: Math.round(start.y + dy) }
+    : resizeRect(start, op, Math.round(dx), Math.round(dy))
+}
 
 const HANDLES: Handle[] = ['nw', 'ne', 'sw', 'se']
 const HANDLE_POS: Record<Handle, string> = {
@@ -49,6 +58,8 @@ export function DocPreview({
   /** Live layers while dragging an image (committed to history on release). */
   const [draftLayers, setDraftLayers] = useState<Layer[] | null>(null)
   const [draftArea, setDraftArea] = useState<Rect | null>(null)
+  /** Live rect of an OCR box while the user moves / resizes it (before Apply). */
+  const [draftBox, setDraftBox] = useState<{ id: string; rect: Rect } | null>(null)
 
   const layers = draftLayers ?? slot.history.present
   const scale = fitScale(slot.width, slot.height, avail.w, avail.h)
@@ -85,6 +96,16 @@ export function DocPreview({
     setDrag({ kind, layerId: layer.id, startX: p.x, startY: p.y, startRect: layer.rect })
   }
 
+  /** Move / resize the selected OCR box, so the removal area fits the old text better. */
+  const startBoxDrag = (e: PointerEvent, box: OcrBox, op: 'move' | Handle): void => {
+    if (selectingArea) return
+    e.stopPropagation()
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+    const p = toImage(e)
+    const kind = op === 'move' ? 'box-move' : (`box-${op}` as const)
+    setDrag({ kind, boxId: box.id, startX: p.x, startY: p.y, startRect: box.rect })
+  }
+
   const onOverlayDown = (e: PointerEvent): void => {
     if (!selectingArea) return
     ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
@@ -102,10 +123,13 @@ export function DocPreview({
     }
     const dx = p.x - drag.startX
     const dy = p.y - drag.startY
-    const rect =
-      drag.kind === 'move'
-        ? { ...drag.startRect, x: Math.round(drag.startRect.x + dx), y: Math.round(drag.startRect.y + dy) }
-        : resizeRect(drag.startRect, drag.kind, Math.round(dx), Math.round(dy))
+    if ('boxId' in drag) {
+      const op = drag.kind === 'box-move' ? 'move' : (drag.kind.slice(4) as Handle)
+      const rect = clampRect(dragRect(drag.startRect, op, dx, dy), slot.width, slot.height)
+      setDraftBox({ id: drag.boxId, rect })
+      return
+    }
+    const rect = dragRect(drag.startRect, drag.kind, dx, dy)
     setDraftLayers(setLayerRect(slot.history.present, drag.layerId, rect))
   }
 
@@ -115,6 +139,14 @@ export function DocPreview({
         onAreaSelected(draftArea)
       }
       setDraftArea(null)
+    } else if (draftBox) {
+      // The adjusted box is used by the next Apply (the OCR text stays the same).
+      if (draftBox.rect.w >= MIN_LAYER_SIZE && draftBox.rect.h >= MIN_LAYER_SIZE) {
+        update(slot.key, {
+          ocr: slot.ocr.map((b) => (b.id === draftBox.id ? { ...b, rect: draftBox.rect } : b))
+        })
+      }
+      setDraftBox(null)
     } else if (draftLayers) {
       commitLayers(slot.key, draftLayers)
     }
@@ -148,23 +180,64 @@ export function DocPreview({
           onPointerMove={onMove}
           onPointerUp={onUp}
         >
-          {/* OCR boxes (preview outlines). Hidden while selecting an area. */}
+          {/* OCR boxes (preview outlines). Hidden while selecting an area.
+              Uncertain lines (low confidence / mostly symbols) are yellow with a label. */}
           {!selectingArea &&
-            slot.ocr.map((box) => (
-              <button
-                key={box.id}
-                type="button"
-                title={box.text}
-                aria-label={t('doc.editBox', { text: box.text })}
-                onClick={() => update(slot.key, { selectedBoxId: box.id, selectedLayerId: null })}
-                className={`absolute border ${
-                  slot.selectedBoxId === box.id
-                    ? 'border-2 border-indigo-500 bg-indigo-500/10'
-                    : 'border-sky-500/70 hover:bg-sky-500/10'
-                }`}
-                style={px(box.rect)}
-              />
-            ))}
+            slot.ocr.map((box) => {
+              const uncertain = isUncertain(box)
+              const label = uncertain && (
+                <span className="pointer-events-none absolute -top-4 left-0 rounded-sm bg-amber-400 px-1 text-[10px] leading-4 whitespace-nowrap text-black">
+                  {t('doc.uncertain')}
+                </span>
+              )
+              if (slot.selectedBoxId === box.id) {
+                // Selected box: drag to move, drag a corner to resize (before Apply).
+                const rect = draftBox?.id === box.id ? draftBox.rect : box.rect
+                return (
+                  <div
+                    key={box.id}
+                    role="group"
+                    title={box.text}
+                    aria-label={t('doc.adjustBox')}
+                    onPointerDown={(e) => startBoxDrag(e, box, 'move')}
+                    onPointerMove={onMove}
+                    onPointerUp={onUp}
+                    className={`absolute cursor-move border-2 ${
+                      uncertain ? 'border-amber-400 bg-amber-400/10' : 'border-indigo-500 bg-indigo-500/10'
+                    }`}
+                    style={px(rect)}
+                  >
+                    {label}
+                    {HANDLES.map((h) => (
+                      <span
+                        key={h}
+                        onPointerDown={(e) => startBoxDrag(e, box, h)}
+                        onPointerMove={onMove}
+                        onPointerUp={onUp}
+                        className={`absolute h-3 w-3 rounded-sm border border-white bg-indigo-600 ${HANDLE_POS[h]}`}
+                      />
+                    ))}
+                  </div>
+                )
+              }
+              return (
+                <button
+                  key={box.id}
+                  type="button"
+                  title={box.text}
+                  aria-label={t(uncertain ? 'doc.editBoxUncertain' : 'doc.editBox', { text: box.text })}
+                  onClick={() => update(slot.key, { selectedBoxId: box.id, selectedLayerId: null })}
+                  className={`absolute border ${
+                    uncertain
+                      ? 'border-amber-400 hover:bg-amber-400/10'
+                      : 'border-sky-500/70 hover:bg-sky-500/10'
+                  }`}
+                  style={px(box.rect)}
+                >
+                  {label}
+                </button>
+              )
+            })}
 
           {/* Placed images: click to select, drag to move, corners to resize. */}
           {layers.map((layer) =>

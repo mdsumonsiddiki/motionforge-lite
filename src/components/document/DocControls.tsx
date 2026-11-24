@@ -6,14 +6,14 @@ import { useLibraryStore } from '../../store/libraryStore'
 import { notify } from '../../store/toastStore'
 import { canRedo, canUndo } from '../../editor/history'
 import { applyTextEdit, removeLayer, textForBox } from '../../editor/edits'
-import { estimateFontSize, estimateTextColor } from '../../editor/textStyle'
+import { isUncertain, looksUnreliable } from '../../editor/ocrBoxes'
 import { loadFontList } from '../../editor/fonts'
 import { BUNDLED_FONTS, type OcrBox } from '../../editor/types'
 import {
-  boxPixels,
   closeSlot,
   exportSlot,
   isInpainting,
+  matchStyle,
   runOcr,
   saveSlot,
   syncAssets
@@ -52,18 +52,26 @@ function TextEditor({
   inpainting: boolean
 }) {
   const { t } = useTranslation()
-  const commitLayers = useDocumentStore((s) => s.commitLayers)
   const [draft, setDraft] = useState(() => textForBox(slot.history.present, box))
+  const [applying, setApplying] = useState(false)
 
-  /** Apply: inpaint the old text away and draw the new text (spec section 8, step 4). */
-  const apply = (): void => {
-    const style = {
-      fontFamily: font,
-      fontSize: estimateFontSize(box.rect.h),
-      color: estimateTextColor(boxPixels(slot.key, box.rect))
+  /**
+   * Apply: remove the old letters and draw the new text (spec section 8, step 4).
+   * Size, position and color are matched to the old letters first (needs the font loaded).
+   */
+  const apply = async (): Promise<void> => {
+    setApplying(true)
+    try {
+      const style = await matchStyle(slot.key, box, font)
+      // Read the latest state: the history may have changed while the font was loading.
+      const { slots, commitLayers } = useDocumentStore.getState()
+      const current = slots.find((s) => s.key === slot.key)
+      if (!current) return
+      commitLayers(slot.key, applyTextEdit(current.history.present, box, draft, style))
+      syncAssets(slot.key)
+    } finally {
+      setApplying(false)
     }
-    commitLayers(slot.key, applyTextEdit(slot.history.present, box, draft, style))
-    syncAssets(slot.key)
   }
 
   return (
@@ -71,12 +79,16 @@ function TextEditor({
       <p className="text-xs text-neutral-500">
         {t('doc.ocrText')}: <span className="text-neutral-700 dark:text-neutral-300">{box.text}</span>
       </p>
+      {isUncertain(box) && (
+        <p className="text-xs text-amber-700 dark:text-amber-300">{t('doc.uncertainHint')}</p>
+      )}
+      <p className="text-xs text-neutral-500">{t('doc.adjustBoxHint')}</p>
       <textarea
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
         rows={3}
         aria-label={t('doc.newText')}
-        className="w-full rounded-md border border-neutral-300 bg-transparent px-2 py-1.5 text-sm dark:border-neutral-700"
+        className="w-full rounded-md border border-neutral-300 bg-transparent px-2 py-1.5 text-sm"
         style={{ fontFamily: `"${font}"` }}
       />
       <label className="block text-sm">
@@ -84,7 +96,7 @@ function TextEditor({
         <select
           value={font}
           onChange={(e) => onFontChange(e.target.value)}
-          className="w-full rounded-md border border-neutral-300 bg-transparent px-2 py-1.5 dark:border-neutral-700 dark:bg-neutral-900"
+          className="w-full rounded-md border border-neutral-300 bg-transparent px-2 py-1.5 dark:bg-neutral-900"
         >
           {fonts.map((f) => (
             <option key={f} value={f}>
@@ -96,8 +108,8 @@ function TextEditor({
       <p className="text-xs text-neutral-500">{t('doc.autoStyle')}</p>
       <button
         type="button"
-        disabled={!draft.trim()}
-        onClick={apply}
+        disabled={!draft.trim() || applying}
+        onClick={() => void apply()}
         className="w-full rounded-md bg-indigo-600 px-3 py-2 text-sm text-white hover:bg-indigo-700 disabled:opacity-50"
       >
         {t('doc.apply')}
@@ -184,7 +196,7 @@ export function DocControls({
             value={slot.name}
             maxLength={100}
             onChange={(e) => update(slot.key, { name: e.target.value })}
-            className="w-full rounded-md border border-neutral-300 bg-transparent px-2 py-1.5 dark:border-neutral-700"
+            className="w-full rounded-md border border-neutral-300 bg-transparent px-2 py-1.5"
           />
         </label>
         <div className="flex flex-wrap gap-2">
@@ -231,6 +243,11 @@ export function DocControls({
         )}
         {slot.ocrStatus === 'done' && (
           <p className="text-xs text-neutral-500">{t('doc.ocrDone', { count: slot.ocr.length })}</p>
+        )}
+        {slot.ocrStatus === 'done' && looksUnreliable(slot.ocr) && (
+          <p role="status" className="text-xs text-amber-700 dark:text-amber-300">
+            {t('doc.unreliableOcr')}
+          </p>
         )}
         {slot.ocrStatus === 'error' && (
           <div className="space-y-2">

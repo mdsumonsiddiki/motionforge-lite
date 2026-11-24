@@ -48,6 +48,18 @@ describe('edits', () => {
     expect(parseEdits(serializeEdits([], layers, false)).ocrDone).toBe(false)
   })
 
+  it('keeps the text anchor and drops a broken one', () => {
+    const anchored = applyTextEdit([], box, 'Hi', { ...style, anchor: { x: 12.5, y: 41 } }, 'L1')
+    expect(parseEdits(serializeEdits([box], anchored, true)).layers).toEqual(anchored)
+    const broken = JSON.stringify({
+      version: 1,
+      ocrDone: true,
+      ocr: [],
+      layers: [{ ...anchored[0], anchor: { x: 'a', y: 1 } }]
+    })
+    expect(parseEdits(broken).layers).toEqual([])
+  })
+
   it('drops invalid entries and survives broken JSON', () => {
     const json = JSON.stringify({
       version: 1,

@@ -16,10 +16,15 @@ export type TextLayer = {
   rect: Rect
   text: string
   fontFamily: string
-  /** px, matched from the box height */
+  /** px, matched from the height of the old letters (falls back to the box height) */
   fontSize: number
-  /** #rrggbb, matched from the dark pixels inside the box */
+  /** #rrggbb, matched from the old text pixels */
   color: string
+  /**
+   * Left origin on the alphabetic baseline of the old letters (image px). One-line text
+   * is drawn here so it sits where the old text was. Missing → centred in the box.
+   */
+  anchor?: { x: number; y: number }
 }
 
 /** A user image placed over a selected rectangle; can be moved and resized. */

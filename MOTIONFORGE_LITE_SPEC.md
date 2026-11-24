@@ -211,8 +211,10 @@ type CharacterState = {
 3. User একটা Box-এ Click করে Text Edit করবে।
 4. Apply চাপলে:
    - পুরোনো লেখার জায়গা `opencv.js inpaint` দিয়ে মুছে যাবে
-     - User-এর সিদ্ধান্ত (2026-11-24): Box-এর চারপাশের background এক রঙের হলে সেই রঙ দিয়ে box ঢেকে দেওয়া হবে, নকশা থাকলে TELEA inpaint। Mask padding box height-এর প্রায় ১৫% (মাত্রা ও ফলা মোছার জন্য)। মোছা ব্যর্থ হলে error toast দেখাবে।
-   - নতুন লেখা Render হবে। Size, Position আর Color স্বয়ংক্রিয়ভাবে মেলানো হবে (Box height থেকে Size, আশেপাশের Dark pixel থেকে Color)
+     - User-এর সিদ্ধান্ত (2026-11-24, সংশোধিত): শুধু অক্ষরের pixel মুছবে। Box-এর ভেতরে threshold (Otsu) দিয়ে text mask, ২–৩px dilate, শুধু সেই mask মোছা হবে; Box-এর বাইরের বা mask-এর বাইরের কোনো pixel বদলাবে না (আগের ১৫% padding বাদ)। অক্ষরের পাশের background এক রঙের হলে সেই রঙ দিয়ে mask ভরাট, নকশা থাকলে TELEA inpaint। পরিষ্কার লেখা না পেলে পুরো Box মোছা হবে। মোছা ব্যর্থ হলে error toast দেখাবে।
+     - Apply-এর আগে User নির্বাচিত Box drag করে সরাতে ও কোণা টেনে Resize করতে পারবে (যেমন Box-এর বাইরে থাকা মাত্রা ঢোকাতে)।
+   - নতুন লেখা Render হবে। Size, Position আর Color স্বয়ংক্রিয়ভাবে মেলানো হবে (User-এর সিদ্ধান্ত 2026-11-24: Size পুরোনো অক্ষরের আসল উচ্চতা (mask-এর glyph height) থেকে, Position পুরোনো লেখার baseline ও বাম প্রান্ত থেকে, Color text pixel থেকে; অক্ষর না পেলে Box height থেকে)
+   - OCR (User-এর সিদ্ধান্ত 2026-11-24): confidence ৬০-এর কম বা বেশিরভাগ চিহ্ন থাকা লাইন হলুদ Box-এ "অনিশ্চিত" লেখা সহ দেখাবে; ৩০-এর কম, অক্ষরহীন, বিশাল (image height-এর ২৫%-এর বেশি) বা Image-এর বাইরে যাওয়া Box বাদ যাবে। অর্ধেক বা বেশি লাইন অনিশ্চিত হলে বার্তা: হাতের লেখা / অস্পষ্ট ছবি, ফল ভালো নাও হতে পারে।
    - **Font: User Dropdown থেকে বেছে নেবে।** Bundled Font: Noto Sans Bengali, Noto Serif Bengali, Hind Siliguri, Noto Sans, Noto Serif (সবগুলো OFL License)। সঙ্গে System-এ Install থাকা Font।
 5. **Image Replace:** User একটা জায়গা (Rectangle) Select করে নতুন ছবি বসাবে। এরপর Drag আর Resize Handle দিয়ে Size ও Position ঠিক করবে।
 6. **Undo / Redo** (Ctrl+Z / Ctrl+Y), শুধু Session-এর মধ্যে।

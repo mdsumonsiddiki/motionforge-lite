@@ -1,5 +1,3 @@
-import type { Rect } from '../editor/types'
-
 /** Message sent to inpaint.worker.ts. `pixels` is the RGBA crop (transferred, not copied). */
 export type InpaintRequest = {
   id: number
@@ -7,8 +5,11 @@ export type InpaintRequest = {
   width: number
   height: number
   pixels: ArrayBuffer
-  /** Area to remove, relative to the crop. */
-  mask: Rect
+  /**
+   * Pixels to remove: one byte per crop pixel, 255 = remove (the dilated text mask),
+   * 0 = keep. Transferred, not copied.
+   */
+  mask: ArrayBuffer
 }
 
 export type InpaintResponse = { id: number; pixels: ArrayBuffer } | { id: number; error: string }

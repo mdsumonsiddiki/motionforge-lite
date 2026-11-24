@@ -10,8 +10,13 @@ import { inpaintBox } from '../workers/inpaintClient'
 import { parseEdits, serializeEdits } from './edits'
 import { readJpegOrientation } from './exif'
 import { reportInpaintFailure } from './inpaintFailure'
-import { fontCss, renderDocument, type RenderAssets } from './render'
-import { MAX_SLOTS, type Layer } from './types'
+import { cropPixels } from './inpaintPlan'
+import { fontCss, patchKey, renderDocument, type RenderAssets } from './render'
+import { maskTextColor, textMask } from './textMask'
+import { estimateFontSize, estimateTextColor, matchPlacement, MEASURE_SIZE } from './textStyle'
+import { clampRect } from './geometry'
+import type { TextStyle } from './edits'
+import { MAX_SLOTS, type Layer, type OcrBox } from './types'
 
 /**
  * Glue between the document store, the workers (OCR, inpaint) and the canvas.
@@ -138,7 +143,7 @@ export async function runOcr(key: string): Promise<void> {
   store().update(key, { ocrStatus: 'running', ocrProgress: 0 })
   try {
     const source = await ocrSource(slot, runtimes.get(key))
-    const boxes = await recognize(source, (p) => {
+    const boxes = await recognize(source, { width: slot.width, height: slot.height }, (p) => {
       if (getSlot(key)) store().update(key, { ocrProgress: p })
     })
     if (getSlot(key)) store().update(key, { ocr: boxes, ocrStatus: 'done', ocrProgress: 1 })
@@ -159,12 +164,16 @@ export function syncAssets(key: string): void {
 
   for (const layer of slot.history.present) {
     if (layer.kind === 'text') {
-      const id = layer.boxId
+      const id = patchKey(layer)
       if (rt.patches.has(id) || rt.failedPatches.has(id) || rt.pendingPatches.has(id)) continue
       const job = inpaintBox(rt.pixels, layer.rect)
-        .then((patch) => {
-          if (patch) rt.patches.set(id, patch)
-          else rt.failedPatches.add(id)
+        .then(async (patch) => {
+          if (!patch) {
+            rt.failedPatches.add(id)
+            return
+          }
+          // A bitmap keeps the transparency, so drawImage changes only the letter pixels.
+          rt.patches.set(id, { x: patch.x, y: patch.y, image: await createImageBitmap(patch.image) })
         })
         .catch(() => {
           rt.failedPatches.add(id) // the new text is then drawn without removing the old one
@@ -204,23 +213,38 @@ export function isInpainting(key: string): boolean {
   return (runtimes.get(key)?.pendingPatches.size ?? 0) > 0
 }
 
-/** Pixels of an OCR box area from the original (used to match the text color). */
-export function boxPixels(key: string, rect: { x: number; y: number; w: number; h: number }): Uint8ClampedArray {
+/** Canvas used only to measure text ink (never drawn). */
+let measureCtx: OffscreenCanvasRenderingContext2D | null = null
+
+/**
+ * Style for the new text of a box, matched to the old letters (spec section 8, step 4):
+ * size and position from the text mask's ink box, color from the text pixels.
+ * Falls back to the box height / darkest pixels when no clear letters are found.
+ */
+export async function matchStyle(key: string, box: OcrBox, fontFamily: string): Promise<TextStyle> {
   const rt = runtimes.get(key)
-  if (!rt) return new Uint8ClampedArray()
-  const { pixels } = rt
-  const x0 = Math.max(0, Math.floor(rect.x))
-  const y0 = Math.max(0, Math.floor(rect.y))
-  const x1 = Math.min(pixels.width, Math.ceil(rect.x + rect.w))
-  const y1 = Math.min(pixels.height, Math.ceil(rect.y + rect.h))
-  const out = new Uint8ClampedArray(Math.max(0, x1 - x0) * Math.max(0, y1 - y0) * 4)
-  for (let y = y0, o = 0; y < y1; y++) {
-    const start = (y * pixels.width + x0) * 4
-    const row = pixels.data.subarray(start, start + (x1 - x0) * 4)
-    out.set(row, o)
-    o += row.length
-  }
-  return out
+  const fallback: TextStyle = { fontFamily, fontSize: estimateFontSize(box.rect.h), color: '#000000' }
+  if (!rt) return fallback
+  const rect = clampRect(box.rect, rt.pixels.width, rt.pixels.height)
+  if (rect.w === 0 || rect.h === 0) return fallback
+  const px = cropPixels(rt.pixels, rect)
+  const tm = textMask(px, rect.w, rect.h)
+  const color = maskTextColor(px, tm) ?? estimateTextColor(px)
+  if (!tm.ink) return { ...fallback, color }
+
+  // Measure the old (OCR) text in the chosen font, once the font is loaded.
+  await document.fonts.load(fontCss(MEASURE_SIZE, fontFamily), box.text).catch(() => [])
+  measureCtx ??= new OffscreenCanvas(1, 1).getContext('2d')
+  const ctx = measureCtx
+  if (!ctx) return { ...fallback, color }
+  const placed = matchPlacement(rect, tm.ink, box.text, (text) => {
+    ctx.font = fontCss(MEASURE_SIZE, fontFamily)
+    ctx.textBaseline = 'alphabetic'
+    const m = ctx.measureText(text)
+    return { ascent: m.actualBoundingBoxAscent, descent: m.actualBoundingBoxDescent, left: m.actualBoundingBoxLeft }
+  })
+  if (!placed) return { ...fallback, color }
+  return { fontFamily, color, fontSize: placed.fontSize, anchor: placed.anchor }
 }
 
 /** Waits until the fonts used by text layers are loaded, so canvas text uses the right font. */

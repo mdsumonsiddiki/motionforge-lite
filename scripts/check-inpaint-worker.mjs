@@ -38,13 +38,18 @@ async function runWorker(label, source) {
   vm.runInContext(source, sandbox, { filename: `${label}-worker.js` })
   if (typeof sandbox.onmessage !== 'function') throw new Error('worker did not set onmessage')
 
-  // 40×20 white crop with a black "text" bar at x 10..29, y 6..13; mask covers the bar.
+  // 40×20 white crop with a black "text" bar at x 10..29, y 6..13; the pixel mask
+  // (one byte per pixel, 255 = remove) covers the bar dilated by 2 px.
   const w = 40
   const h = 20
   const px = new Uint8ClampedArray(w * h * 4).fill(255)
   for (let y = 6; y < 14; y++) for (let x = 10; x < 30; x++) px.set([0, 0, 0, 255], (y * w + x) * 4)
+  // A grey marker pixel outside the mask: the worker must not change it.
+  px.set([128, 128, 128, 255], (1 * w + 1) * 4)
+  const mask = new Uint8Array(w * h)
+  for (let y = 4; y < 16; y++) for (let x = 8; x < 32; x++) mask[y * w + x] = 255
   sandbox.onmessage({
-    data: { id: 1, opencvUrl: 'http://x/opencv/opencv.js', width: w, height: h, pixels: px.buffer, mask: { x: 8, y: 4, w: 24, h: 12 } }
+    data: { id: 1, opencvUrl: 'http://x/opencv/opencv.js', width: w, height: h, pixels: px.buffer, mask: mask.buffer }
   })
   const started = Date.now()
   while (messages.length === 0 && Date.now() - started < 60_000) await new Promise((r) => setTimeout(r, 50))
@@ -56,6 +61,8 @@ async function runWorker(label, source) {
   let darkest = 255
   for (let y = 6; y < 14; y++) for (let x = 10; x < 30; x++) darkest = Math.min(darkest, out[(y * w + x) * 4])
   if (darkest < 200) throw new Error(`text not removed (darkest ${darkest})`)
+  const marker = out[(1 * w + 1) * 4]
+  if (marker !== 128) throw new Error(`pixel outside the mask changed (${marker})`)
   return `${label}: OK (${Date.now() - started} ms, darkest ${darkest})`
 }
 

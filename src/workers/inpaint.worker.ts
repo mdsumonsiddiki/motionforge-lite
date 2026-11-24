@@ -18,10 +18,7 @@
     Mat: { zeros(rows: number, cols: number, type: number): CvMat }
     matFromImageData(img: { data: Uint8ClampedArray; width: number; height: number }): CvMat
     cvtColor(src: CvMat, dst: CvMat, code: number): void
-    rectangle(img: CvMat, p1: CvPoint, p2: CvPoint, color: CvScalar, thickness: number): void
     inpaint(src: CvMat, mask: CvMat, dst: CvMat, radius: number, flags: number): void
-    Point: new (x: number, y: number) => CvPoint
-    Scalar: new (...v: number[]) => CvScalar
     CV_8UC1: number
     COLOR_RGBA2RGB: number
     COLOR_RGB2RGBA: number
@@ -29,8 +26,6 @@
     onRuntimeInitialized?: () => void
   }
   type CvMat = { data: Uint8Array; delete(): void }
-  type CvPoint = object
-  type CvScalar = object
 
   type WorkerScope = {
     importScripts?: (url: string) => void
@@ -68,7 +63,9 @@
   }
 
   function inpaint(cv: Cv, req: InpaintRequest): Uint8ClampedArray<ArrayBuffer> {
-    const { width, height, mask: m } = req
+    const { width, height } = req
+    const maskBytes = new Uint8Array(req.mask)
+    if (maskBytes.length !== width * height) throw new Error('Mask size does not match the crop')
     const rgba = cv.matFromImageData({ data: new Uint8ClampedArray(req.pixels), width, height })
     const rgb = cv.Mat.zeros(height, width, 0)
     const mask = cv.Mat.zeros(height, width, cv.CV_8UC1)
@@ -76,13 +73,8 @@
     const outRgba = cv.Mat.zeros(height, width, 0)
     try {
       cv.cvtColor(rgba, rgb, cv.COLOR_RGBA2RGB)
-      cv.rectangle(
-        mask,
-        new cv.Point(m.x, m.y),
-        new cv.Point(m.x + m.w - 1, m.y + m.h - 1),
-        new cv.Scalar(255),
-        -1
-      )
+      // Only the letter pixels (dilated text mask) are inpainted, never the whole box.
+      mask.data.set(maskBytes)
       cv.inpaint(rgb, mask, out, INPAINT_RADIUS, cv.INPAINT_TELEA)
       cv.cvtColor(out, outRgba, cv.COLOR_RGB2RGBA)
       return new Uint8ClampedArray(outRgba.data) // copy out of WASM memory

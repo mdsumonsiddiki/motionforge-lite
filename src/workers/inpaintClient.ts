@@ -1,9 +1,18 @@
-import { planInpaint } from '../editor/inpaintPlan'
-import { solidPixels, uniformRingColor } from '../editor/solidFill'
+import {
+  buildPatch,
+  cropColor,
+  cropMask,
+  cropPixels,
+  planRemoval,
+  type Pixels
+} from '../editor/inpaintPlan'
 import type { Rect } from '../editor/types'
 import type { InpaintRequest, InpaintResponse } from './inpaintProtocol'
 
-/** An inpainted piece of the image, drawn over the original at (x, y). */
+/**
+ * A removal patch, box-sized, drawn over the original at (x, y).
+ * Only the old letter pixels are opaque; every other pixel is transparent.
+ */
 export type Patch = { x: number; y: number; image: ImageData }
 
 let worker: Worker | null = null
@@ -34,30 +43,27 @@ function getWorker(): Worker {
 const opencvUrl = (): string => new URL('opencv/opencv.js', document.baseURI).href
 
 /**
- * Removes the content of `box` from the original image (spec section 8, step 4).
+ * Removes the old letters inside `box` (spec section 8, step 4).
+ * The text mask is computed on the main thread (one line box, cheap); only TELEA
+ * inpainting of a patterned background runs in the worker.
  * @param original pixels of the untouched original image
  */
-export function inpaintBox(original: ImageData, box: Rect): Promise<Patch | null> {
-  const plan = planInpaint(box, original.width, original.height)
+export function inpaintBox(original: Pixels, box: Rect): Promise<Patch | null> {
+  const plan = planRemoval(original, box)
   if (!plan) return Promise.resolve(null)
-  const { crop, mask } = plan
+  const at = { x: plan.box.x, y: plan.box.y }
 
-  // Copy the crop rows out of the full image.
-  const pixels = new Uint8ClampedArray(crop.w * crop.h * 4)
-  for (let row = 0; row < crop.h; row++) {
-    const start = ((crop.y + row) * original.width + crop.x) * 4
-    pixels.set(original.data.subarray(start, start + crop.w * 4), row * crop.w * 4)
+  // Plain background (e.g. a white page): fill the letter pixels with that color.
+  if (plan.solid) {
+    const color = plan.solid
+    const image = new ImageData(buildPatch(plan, () => color), plan.box.w, plan.box.h)
+    return Promise.resolve({ ...at, image })
   }
 
-  // Plain background around the text (e.g. a white page): cover the box with that color.
-  // Cheap (only the small ring around the box is read), so it runs here, not in the worker.
-  const solid = uniformRingColor(pixels, crop.w, crop.h, mask)
-  if (solid) {
-    const image = new ImageData(solidPixels(mask.w, mask.h, solid), mask.w, mask.h)
-    return Promise.resolve({ x: crop.x + mask.x, y: crop.y + mask.y, image })
-  }
-
-  // Patterned / textured background: OpenCV TELEA inpainting in the worker.
+  // Patterned / textured background: OpenCV TELEA on the letter pixels only.
+  const { crop } = plan
+  const pixels = cropPixels(original, crop)
+  const mask = cropMask(plan)
   const id = nextId++
   const req: InpaintRequest = {
     id,
@@ -65,20 +71,13 @@ export function inpaintBox(original: ImageData, box: Rect): Promise<Patch | null
     width: crop.w,
     height: crop.h,
     pixels: pixels.buffer,
-    mask
+    mask: mask.buffer
   }
   return new Promise<ArrayBuffer>((resolve, reject) => {
     pending.set(id, { resolve, reject })
-    getWorker().postMessage(req, [pixels.buffer])
+    getWorker().postMessage(req, [pixels.buffer, mask.buffer])
   }).then((buffer) => {
-    // Keep only the masked area: the margin around it is unchanged original pixels, and
-    // drawing it back would cover neighbouring edits (e.g. the line just above).
-    const full = new Uint8ClampedArray(buffer)
-    const out = new Uint8ClampedArray(mask.w * mask.h * 4)
-    for (let row = 0; row < mask.h; row++) {
-      const start = ((mask.y + row) * crop.w + mask.x) * 4
-      out.set(full.subarray(start, start + mask.w * 4), row * mask.w * 4)
-    }
-    return { x: crop.x + mask.x, y: crop.y + mask.y, image: new ImageData(out, mask.w, mask.h) }
+    const image = new ImageData(buildPatch(plan, cropColor(plan, new Uint8ClampedArray(buffer))), plan.box.w, plan.box.h)
+    return { ...at, image }
   })
 }

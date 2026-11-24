@@ -69,7 +69,7 @@ export function OpenControls() {
             value={selected}
             onChange={(e) => setSelected(e.target.value)}
             aria-label={t('doc.savedDocuments')}
-            className="min-w-0 flex-1 rounded-md border border-neutral-300 bg-transparent px-2 py-1.5 text-sm dark:border-neutral-700 dark:bg-neutral-900"
+            className="min-w-0 flex-1 rounded-md border border-neutral-300 bg-transparent px-2 py-1.5 text-sm dark:bg-neutral-900"
           >
             <option value="">{t('doc.chooseSaved')}</option>
             {documents.map((d) => (
