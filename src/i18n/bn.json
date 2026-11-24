@@ -31,6 +31,26 @@
     "obsDetect": "Auto-detect",
     "obsBrowseTitle": "obs64.exe বেছে নিন"
   },
+  "library": {
+    "characters": "সংরক্ষিত Character",
+    "documents": "সংরক্ষিত Document",
+    "empty": "এখনো কিছু সংরক্ষণ করা হয়নি।",
+    "delete": "মুছুন",
+    "deleteTitle": "এটি মুছে ফেলবেন?",
+    "deleteMessage": "\"{{name}}\" স্থায়ীভাবে মুছে যাবে।"
+  },
+  "backup": {
+    "title": "Backup ও Restore",
+    "hint": "Backup-এ Character, Document আর Settings একটা .zip ফাইলে থাকে। API Key কখনো যায় না।",
+    "backup": "Backup…",
+    "restore": "Restore…",
+    "pickFolder": "Backup রাখার Folder বেছে নিন",
+    "pickFile": "Backup .zip ফাইল বেছে নিন",
+    "saved": "Backup সংরক্ষিত: {{file}}",
+    "restored": "Restore সম্পন্ন হয়েছে।",
+    "restoreTitle": "Backup থেকে Restore করবেন?",
+    "restoreMessage": "বর্তমান সব Character, Document আর Settings Backup দিয়ে বদলে যাবে।"
+  },
   "close": {
     "title": "MotionForge Lite বন্ধ করবেন?",
     "message": "আপনি কি নিশ্চিত যে App বন্ধ করতে চান?",
@@ -44,6 +64,10 @@
   "errors": {
     "settingsLoad": "Settings লোড করা যায়নি। Default মান ব্যবহার হচ্ছে।",
     "settingsSave": "Settings সংরক্ষণ করা যায়নি।",
-    "obsNotFound": "OBS Studio পাওয়া যায়নি। অনুগ্রহ করে obs64.exe নিজে বেছে নিন।"
+    "obsNotFound": "OBS Studio পাওয়া যায়নি। অনুগ্রহ করে obs64.exe নিজে বেছে নিন।",
+    "storageLoad": "সংরক্ষিত Item লোড করা যায়নি।",
+    "storageDelete": "Item মুছে ফেলা যায়নি।",
+    "backupFailed": "Backup ব্যর্থ হয়েছে।",
+    "restoreFailed": "Restore ব্যর্থ হয়েছে। ফাইলটি MotionForge Lite Backup কি না, যাচাই করুন।"
   }
 }

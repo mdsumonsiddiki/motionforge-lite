@@ -1,12 +1,14 @@
 import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Language, Settings as SettingsData, Theme } from '../../electron/shared/settings'
+import { ConfirmDialog } from '../components/ConfirmDialog'
+import { useLibraryStore } from '../store/libraryStore'
 import { useSettingsStore } from '../store/settingsStore'
 import { notify } from '../store/toastStore'
 
 /**
- * Settings page. Phase 2: Language, Theme, OBS Path.
- * (API Key, Backup, Restore and Output info are added in later phases.)
+ * Settings page: Language, Theme, OBS Path, Backup / Restore.
+ * (API Key and Output info are added in later phases.)
  */
 export function Settings() {
   const { t } = useTranslation()
@@ -45,6 +47,90 @@ export function Settings() {
         {/* key: re-mount the input when the saved path changes (Browse / Auto-detect). */}
         <ObsPathInput key={settings.obsPath} settings={settings} onSave={update} />
       </Field>
+
+      <Field label={t('backup.title')} hint={t('backup.hint')}>
+        <BackupRestore />
+      </Field>
+    </div>
+  )
+}
+
+/**
+ * Backup (user picks a folder) and Restore (confirmation, then user picks the zip).
+ * The result is shown as a line of text under the buttons, not as a toast
+ * (spec section 6 allows only "Generation Complete" and "Error" notifications).
+ */
+function BackupRestore() {
+  const { t } = useTranslation()
+  const [busy, setBusy] = useState(false)
+  const [confirmRestore, setConfirmRestore] = useState(false)
+  const [status, setStatus] = useState<string | null>(null)
+  const reloadSettings = useSettingsStore((s) => s.load)
+  const refreshLibrary = useLibraryStore((s) => s.refresh)
+
+  const backup = async (): Promise<void> => {
+    setBusy(true)
+    setStatus(null)
+    try {
+      const result = await window.api.backup.create(t('backup.pickFolder'))
+      if (result.status === 'done') setStatus(t('backup.saved', { file: result.file }))
+    } catch {
+      notify.error('errors.backupFailed')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const restore = async (): Promise<void> => {
+    setConfirmRestore(false)
+    setBusy(true)
+    setStatus(null)
+    try {
+      const result = await window.api.backup.restore(t('backup.pickFile'))
+      if (result.status === 'done') {
+        // Restored settings (theme, language) and name lists take effect right away.
+        await Promise.all([reloadSettings(), refreshLibrary()])
+        setStatus(t('backup.restored'))
+      }
+    } catch {
+      notify.error('errors.restoreFailed')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const buttonClass =
+    'rounded-md border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100 disabled:opacity-50 dark:border-neutral-700 dark:hover:bg-neutral-800'
+
+  return (
+    <div>
+      <div className="flex gap-2">
+        <button type="button" disabled={busy} onClick={() => void backup()} className={buttonClass}>
+          {t('backup.backup')}
+        </button>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => setConfirmRestore(true)}
+          className={buttonClass}
+        >
+          {t('backup.restore')}
+        </button>
+      </div>
+      {status && (
+        <p role="status" className="mt-2 text-sm break-all text-emerald-600 dark:text-emerald-400">
+          {status}
+        </p>
+      )}
+      <ConfirmDialog
+        open={confirmRestore}
+        title={t('backup.restoreTitle')}
+        message={t('backup.restoreMessage')}
+        confirmLabel={t('backup.restore')}
+        cancelLabel={t('close.cancel')}
+        onCancel={() => setConfirmRestore(false)}
+        onConfirm={() => void restore()}
+      />
     </div>
   )
 }

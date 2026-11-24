@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IPC } from './shared/ipc'
 import type { Settings } from './shared/settings'
+import type { BackupResult, ItemKind, ItemSummary } from './shared/storage'
 
 /**
  * Safe IPC bridge exposed to the renderer as `window.api`.
@@ -21,6 +22,23 @@ const api = {
     /** Opens a file picker; returns the chosen path or null if cancelled. */
     browse: (dialogTitle: string): Promise<string | null> =>
       ipcRenderer.invoke(IPC.obsBrowse, dialogTitle)
+  },
+
+  storage: {
+    /** Name list (newest first) for the Dashboard. */
+    list: (kind: ItemKind): Promise<ItemSummary[]> => ipcRenderer.invoke(IPC.storageList, kind),
+    /** Deletes an item. Call only after the user confirmed. */
+    delete: (kind: ItemKind, id: string): Promise<boolean> =>
+      ipcRenderer.invoke(IPC.storageDelete, kind, id)
+  },
+
+  backup: {
+    /** Asks for a folder and writes the backup zip there. */
+    create: (dialogTitle: string): Promise<BackupResult> =>
+      ipcRenderer.invoke(IPC.backupCreate, dialogTitle),
+    /** Asks for a zip and restores it. Call only after the user confirmed. */
+    restore: (dialogTitle: string): Promise<BackupResult> =>
+      ipcRenderer.invoke(IPC.backupRestore, dialogTitle)
   },
 
   app: {

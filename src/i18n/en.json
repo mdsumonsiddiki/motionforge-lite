@@ -31,6 +31,26 @@
     "obsDetect": "Auto-detect",
     "obsBrowseTitle": "Select obs64.exe"
   },
+  "library": {
+    "characters": "Saved Characters",
+    "documents": "Saved Documents",
+    "empty": "Nothing saved yet.",
+    "delete": "Delete",
+    "deleteTitle": "Delete this item?",
+    "deleteMessage": "\"{{name}}\" will be permanently deleted."
+  },
+  "backup": {
+    "title": "Backup & Restore",
+    "hint": "Backup saves Characters, Documents and Settings in one .zip file. The API key is never included.",
+    "backup": "Backup…",
+    "restore": "Restore…",
+    "pickFolder": "Choose a folder for the backup",
+    "pickFile": "Choose a backup .zip file",
+    "saved": "Backup saved: {{file}}",
+    "restored": "Restore complete.",
+    "restoreTitle": "Restore from backup?",
+    "restoreMessage": "All current Characters, Documents and Settings will be replaced by the backup."
+  },
   "close": {
     "title": "Close MotionForge Lite?",
     "message": "Are you sure you want to close the app?",
@@ -44,6 +64,10 @@
   "errors": {
     "settingsLoad": "Could not load settings. Defaults are used.",
     "settingsSave": "Could not save settings.",
-    "obsNotFound": "OBS Studio was not found. Please select obs64.exe manually."
+    "obsNotFound": "OBS Studio was not found. Please select obs64.exe manually.",
+    "storageLoad": "Could not load saved items.",
+    "storageDelete": "Could not delete the item.",
+    "backupFailed": "Backup failed.",
+    "restoreFailed": "Restore failed. Please check that the file is a MotionForge Lite backup."
   }
 }

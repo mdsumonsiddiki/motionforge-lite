@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { join } from 'node:path'
 import { IPC } from './shared/ipc'
 import { registerSettingsIpc } from './ipc/settings'
+import { registerStorageIpc } from './ipc/storage'
 
 /**
  * Creates the main application window.
@@ -75,6 +76,7 @@ function setupCloseConfirmation(win: BrowserWindow): void {
 
 app.whenReady().then(() => {
   registerSettingsIpc()
+  registerStorageIpc()
   createMainWindow()
 
   app.on('activate', () => {

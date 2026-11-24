@@ -18,6 +18,11 @@ function getSettings(): Settings {
   return current
 }
 
+/** Drops the in-memory copy so the next read comes from disk (used after Restore). */
+export function invalidateSettingsCache(): void {
+  current = null
+}
+
 /** Registers settings + OBS-path IPC handlers. Call once after `app.whenReady()`. */
 export function registerSettingsIpc(): void {
   ipcMain.handle(IPC.settingsGet, () => getSettings())
