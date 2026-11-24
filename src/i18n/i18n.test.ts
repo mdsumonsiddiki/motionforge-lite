@@ -16,8 +16,7 @@ function get(obj: object, key: string): unknown {
 
 /**
  * bn values that may stay without Bengali letters: proper names (app and page names from
- * the spec), formats and product names. Webcam Output strings (output.*) are listed as
- * they are today and are not part of this check's translation pass.
+ * the spec), formats ("16:9 (1280×720)") and product names (OBS Studio, "OBS · LIVE").
  */
 const ENGLISH_OK = new Set([
   'app.name',
@@ -25,21 +24,13 @@ const ENGLISH_OK = new Set([
   'nav.document',
   'nav.output',
   'obs.live',
+  'home.live',
   'dashboard.human',
   'dashboard.document',
   'dashboard.output',
   'settings.languageEn',
-  'output.window',
-  'output.size',
   'output.landscape',
   'output.portrait',
-  'output.document',
-  'output.zoomIn',
-  'output.zoomOut',
-  'output.resetPosition',
-  'output.background',
-  'output.bgOriginal',
-  'output.bgGreen',
   'output.obs'
 ])
 

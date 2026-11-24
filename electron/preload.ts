@@ -63,7 +63,9 @@ const api = {
     launch: (): Promise<'launched' | 'empty' | 'notObs' | 'missing' | 'failed'> =>
       ipcRenderer.invoke(IPC.obsLaunch),
     /** Asks OBS to close normally (never force-killed). */
-    close: (): Promise<'closing' | 'notRunning' | 'failed'> => ipcRenderer.invoke(IPC.obsClose)
+    close: (): Promise<'closing' | 'notRunning' | 'failed'> => ipcRenderer.invoke(IPC.obsClose),
+    /** True while obs64.exe is running (navbar OBS pill). */
+    isRunning: (): Promise<boolean> => ipcRenderer.invoke(IPC.obsStatus)
   },
 
   output: {

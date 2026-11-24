@@ -5,9 +5,26 @@ import {
   closeResult,
   DEFAULT_OBS_PATH,
   detectObsPath,
+  isObsRunning,
   launchCommand,
-  OBS_CANDIDATE_PATHS
+  OBS_CANDIDATE_PATHS,
+  STATUS_COMMAND
 } from './obs'
+
+describe('OBS running check', () => {
+  it('lists only obs64.exe, read-only', () => {
+    expect(STATUS_COMMAND.command).toBe('tasklist')
+    expect(STATUS_COMMAND.args).toContain('IMAGENAME eq obs64.exe')
+    expect(STATUS_COMMAND.args).not.toContain('/F')
+  })
+
+  it('parses tasklist output', () => {
+    expect(isObsRunning('"obs64.exe","1234","Console","1","250,000 K"\r\n')).toBe(true)
+    expect(isObsRunning('INFO: No tasks are running which match the specified criteria.\r\n')).toBe(false)
+    expect(isObsRunning('')).toBe(false)
+    expect(isObsRunning('"notobs64.exe","1","Console","1","1 K"')).toBe(false)
+  })
+})
 
 describe('detectObsPath', () => {
   it('returns the default path when it exists', () => {

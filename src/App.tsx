@@ -8,13 +8,14 @@ import { HomePanel } from './pages/home/HomePanel'
 import { DocumentEditor, DocumentPanel } from './pages/DocumentEditor'
 import { HumanStudio } from './pages/HumanStudio'
 import { Settings } from './pages/Settings'
-import { WebcamOutput } from './pages/WebcamOutput'
+import { WebcamOutput, WebcamOutputPanel } from './pages/WebcamOutput'
 import { useNavStore, type Page } from './store/navStore'
 import { useSettingsStore } from './store/settingsStore'
 import { useOutputSync } from './output/useOutputSync'
 import { Shell } from './shell/Shell'
 import { ObsPill } from './shell/ObsPill'
 import { ProfileCard } from './shell/ProfileCard'
+import { useObsPolling, useObsStore } from './store/obsStore'
 
 /**
  * Sections (UI_REDESIGN.md section 5): center workspace + optional right control panel.
@@ -26,7 +27,7 @@ const SECTIONS: Record<Page, Section> = {
   home: { titleKey: 'nav.home', center: Home, right: HomePanel },
   human: { titleKey: 'nav.human', center: HumanStudio },
   document: { titleKey: 'nav.document', center: DocumentEditor, right: DocumentPanel },
-  output: { titleKey: 'nav.output', center: WebcamOutput },
+  output: { titleKey: 'nav.output', center: WebcamOutput, right: WebcamOutputPanel },
   settings: { titleKey: 'nav.settings', center: Settings }
 }
 
@@ -39,6 +40,9 @@ export default function App() {
 
   // Keep the Webcam Output window in sync with the controls and open documents.
   useOutputSync()
+  // Navbar OBS pill: Offline / Running.
+  useObsPolling()
+  const obsStatus = useObsStore((s) => s.status)
 
   // Load saved settings once (theme, language and sidebar state survive a restart).
   useEffect(() => {
@@ -72,7 +76,7 @@ export default function App() {
     <>
       <Shell
         title={t(section.titleKey)}
-        obsPill={<ObsPill status="offline" />}
+        obsPill={<ObsPill status={obsStatus} />}
         profile={<ProfileCard collapsed={settings?.sidebarCollapsed ?? false} />}
         center={<Center />}
         right={Right ? <Right /> : undefined}

@@ -14,6 +14,8 @@ export const IPC = {
   docExport: 'document:export',
   obsLaunch: 'obs:launch',
   obsClose: 'obs:close',
+  /** Is OBS (obs64.exe) running? For the navbar OBS pill. Read-only. */
+  obsStatus: 'obs:status',
   outputOpen: 'output:open',
   outputClose: 'output:close',
   outputIsOpen: 'output:is-open',

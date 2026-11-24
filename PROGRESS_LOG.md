@@ -164,3 +164,12 @@ Claude Code প্রতিটা Phase শেষে এখানে একট�
 - New tokens `--warn` / `--danger-text` (warning / error text), checked ≥ 4.5:1 on every surface in both themes.
 - Tests: all existing editor tests unchanged and passing. typecheck ✅ lint ✅ test ✅ (195) build ✅.
 - Manual test for user: open 1 document → tabs show it + two "+ Open document"; click a text box → right panel shows Detected / textarea / Font / Apply; Apply works as before; Select area → drag → pick image; Undo / Redo; Export → PNG; Save; Delete.
+
+## UI Redesign — Step 6: Webcam Output re-skin + OBS pill Offline / Running (2026-11-25, branch `ui-redesign`)
+- Center: sunken frame (padding 16) with a live preview of the output (`output/OutputPreview.tsx`: draws like the Output window — background fill / custom picture, the shown document with its edits, zoom / position; 9:16 shown upright), "Source: Document" label, chips "1280 × 720 · 24 FPS" and "Background: Original (white) / Green Screen / Custom image", OBS how-to card. Home's Live Output card uses the same preview.
+- Right panel: Output · Source (Human disabled — "Coming soon (Phase 9)", Document) · Background Original / Green / Custom (+ Choose background image…) · Open / Close output window · Launch OBS / Close OBS · Go Live in OBS (disabled, "Coming soon") · Output size 16:9 / 9:16 · Document choice · zoom / arrows / reset. All existing Phase 5 features kept.
+- OBS pill: new read-only IPC `obs:status` (main runs `tasklist /FI "IMAGENAME eq obs64.exe"`, renderer polls every 3 s, also right after Launch / Close) → "OBS · Offline" (grey dot) / "OBS · Running" (accent dot). LIVE style kept behind `OBS_LIVE_ENABLED = false` (needs OBS WebSocket).
+- Note: the preview uses the real output colours (Green Screen #00ff00 from the spec) instead of the reference mock colour #00b140, so it shows what OBS gets.
+- i18n: new output / home strings in en + bn; the remaining English-only Bangla Webcam Output strings (Output Window, Zoom In, Background, Original, …) are now translated (open issue from the i18n task).
+- Tests: `obs.test.ts` running-check command + tasklist parsing; i18n allow-list shrunk. typecheck ✅ lint ✅ test ✅ (197) build ✅.
+- Manual test for user: Webcam Output → preview shows the open document; switch Green / Custom → preview + chip change; zoom / arrows move the preview like the Output window; Launch OBS → pill turns "OBS · Running" within ~3 s; Close OBS → "OBS · Offline".

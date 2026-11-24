@@ -57,6 +57,22 @@ export function launchCommand(obsPath: string): Command {
  */
 export const CLOSE_COMMAND: Command = { command: 'taskkill', args: ['/IM', OBS_EXE] }
 
+/**
+ * Running check for the navbar OBS pill (UI_REDESIGN.md 4.2): lists only obs64.exe
+ * processes as CSV without a header. Read-only, never changes anything.
+ */
+export const STATUS_COMMAND: Command = {
+  command: 'tasklist',
+  args: ['/FI', `IMAGENAME eq ${OBS_EXE}`, '/FO', 'CSV', '/NH']
+}
+
+/** True when tasklist's CSV output has an obs64.exe row ("INFO: No tasks…" otherwise). */
+export function isObsRunning(tasklistOutput: string): boolean {
+  return tasklistOutput
+    .split(/\r?\n/)
+    .some((line) => line.trim().toLowerCase().startsWith(`"${OBS_EXE}"`))
+}
+
 export type CloseResult = 'closing' | 'notRunning' | 'failed'
 
 /** Interprets taskkill's exit code (128 = no such process). */

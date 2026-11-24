@@ -1,7 +1,14 @@
 import { execFile, spawn } from 'node:child_process'
 import { ipcMain } from 'electron'
 import { IPC } from '../shared/ipc'
-import { checkObsPath, CLOSE_COMMAND, closeResult, launchCommand } from '../services/obs'
+import {
+  checkObsPath,
+  CLOSE_COMMAND,
+  closeResult,
+  isObsRunning,
+  launchCommand,
+  STATUS_COMMAND
+} from '../services/obs'
 import { getSettings } from './settings'
 
 export type ObsLaunchResult = 'launched' | 'empty' | 'notObs' | 'missing' | 'failed'
@@ -31,6 +38,18 @@ export function registerObsIpc(): void {
         const code = err ? (typeof err.code === 'number' ? err.code : null) : 0
         resolve(closeResult(code))
       })
+    })
+  )
+
+  // Navbar OBS pill (UI_REDESIGN.md 4.2): is obs64.exe running? Errors → not running.
+  ipcMain.handle(IPC.obsStatus, () =>
+    new Promise<boolean>((resolve) => {
+      execFile(
+        STATUS_COMMAND.command,
+        STATUS_COMMAND.args,
+        { windowsHide: true, timeout: 5000 },
+        (err, stdout) => resolve(!err && isObsRunning(String(stdout)))
+      )
     })
   )
 }

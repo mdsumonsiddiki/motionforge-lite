@@ -5,7 +5,9 @@ import { handleOpenResult, openErrorKey } from '../../components/document/openEr
 import { isDirty, useDocumentStore, type Slot } from '../../store/documentStore'
 import { useLibraryStore } from '../../store/libraryStore'
 import { useNavStore } from '../../store/navStore'
-import { pickShownSlot, useOutputStore } from '../../store/outputStore'
+import { useObsStore } from '../../store/obsStore'
+import { useOutputStore } from '../../store/outputStore'
+import { OutputPreview } from '../../output/OutputPreview'
 import { useSettingsStore } from '../../store/settingsStore'
 import { notify } from '../../store/toastStore'
 import { ImageIcon } from '../../shell/icons'
@@ -28,13 +30,6 @@ const bigBtn: CSSProperties = {
   fontFamily: 'inherit',
   fontSize: 14
 }
-
-/** Output background colours as in the reference (custom = picked image, else gradient). */
-const OUTPUT_BG = {
-  original: '#ffffff',
-  green: '#00b140',
-  custom: 'linear-gradient(135deg, #1e3a8a, #9333ea)'
-} as const
 
 /** Opens a saved document by id (or focuses it when already open). Returns the slot key. */
 async function openSavedById(id: string): Promise<string | null> {
@@ -233,25 +228,25 @@ function ContinueCard() {
   )
 }
 
-/** Mini 16:9 preview of what the Output window shows (document mode, Phase 5). */
+/** Mini 16:9 preview of what the Output window shows (document mode, Phase 5), + OBS status. */
 function LiveOutputCard() {
   const { t } = useTranslation()
-  const slots = useDocumentStore((s) => s.slots)
-  const documentKey = useOutputStore((s) => s.documentKey)
-  const background = useOutputStore((s) => s.background)
-  const customBackground = useOutputStore((s) => s.customBackground)
-  const shownKey = pickShownSlot(
-    slots.map((s) => s.key),
-    documentKey
-  )
-  const shown = slots.find((s) => s.key === shownKey) ?? null
-  const customImage = background === 'custom' ? customBackground : null
+  const hasDocument = useDocumentStore((s) => s.slots.length > 0)
+  const obsStatus = useObsStore((s) => s.status)
 
   return (
     <section className="as-raise as-glass" style={{ ...cardStyle, padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>{t('home.liveOutput')}</h2>
-        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)' }}>{t('home.offline')}</span>
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: obsStatus === 'live' ? 'var(--live-fg)' : obsStatus === 'running' ? 'var(--text)' : 'var(--muted)'
+          }}
+        >
+          {t(`home.${obsStatus}`)}
+        </span>
       </div>
       <div className="as-sink" style={{ borderRadius: 16, padding: 8, background: 'var(--inset)' }}>
         <div
@@ -260,29 +255,22 @@ function LiveOutputCard() {
             aspectRatio: '16 / 9',
             borderRadius: 10,
             overflow: 'hidden',
-            background: OUTPUT_BG[background],
+            background: '#000000',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}
         >
-          {customImage && (
-            <BlobImage
-              image={customImage}
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          )}
-          {shown ? (
-            <BlobImage
-              image={shown.original}
-              style={{ position: 'relative', maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-            />
-          ) : (
+          <OutputPreview style={{ position: 'absolute', inset: 0 }} />
+          {!hasDocument && (
             <span
               style={{
                 position: 'relative',
                 fontSize: 11,
-                color: background === 'original' ? '#5f5980' : '#ffffff'
+                padding: '4px 8px',
+                borderRadius: 999,
+                background: 'rgba(0,0,0,0.6)',
+                color: '#ffffff'
               }}
             >
               {t('home.noOutput')}
