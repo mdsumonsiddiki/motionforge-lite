@@ -114,3 +114,12 @@ Claude Code প্রতিটা Phase শেষে এখানে একট�
 - Tests: typecheck ✅ lint ✅ test ✅ (170; new: box move undo/redo interleaved with a layer edit, dirty state) build ✅.
 - Manual test for user: select a box → drag / resize it → Ctrl+Z (box jumps back) → Ctrl+Y (moved again). Apply text, then Ctrl+Z twice: first the text, then the box move is undone.
 - Open issues: none new.
+
+## Fix — Untranslated strings (en/bn) (2026-11-24)
+- Audit (script over en.json / bn.json and all .ts/.tsx in src + electron): no missing keys, no t() key without a translation, no hard-coded user-visible text in components (only `Ctrl+Z` / `Ctrl+Y` shortcut hints and file-filter format names in main, which stay as they are).
+- Translated 18 bn values that were plain English: Settings, Theme, Dark, Light, OBS Path, Auto-detect, Backup…, Restore…, Document (editor section), Save, PNG/JPG Export, Font, Apply, Undo / Redo, Undo, Redo.
+- Kept in English on purpose: app and page names (MotionForge Lite, Human Studio, Document Editor, Webcam Output), "English", OBS Studio, aspect ratios. Webcam Output strings (`output.*`) were not changed (out of scope for this task).
+- `i18n.test.ts`: new checks — every bn string has Bengali letters unless it is on the allow-list, and no string is empty.
+- Tests: typecheck ✅ lint ✅ test ✅ (172) build ✅.
+- Manual test for user: Settings → Language বাংলা → Settings page, Document Editor buttons (Save, Apply, Undo/Redo, Font) are in Bangla.
+- Open issues: `output.*` still has English-only Bangla values (Zoom In, Background, Original…); translate when Webcam Output may be changed.

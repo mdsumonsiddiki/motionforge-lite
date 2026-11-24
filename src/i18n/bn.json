@@ -4,7 +4,7 @@
   },
   "nav": {
     "back": "Dashboard-এ ফিরুন",
-    "settings": "Settings"
+    "settings": "সেটিংস"
   },
   "dashboard": {
     "human": "Human Studio",
@@ -18,17 +18,17 @@
     "comingSoon": "এই অংশটি পরের একটি Phase-এ তৈরি হবে।"
   },
   "settings": {
-    "title": "Settings",
+    "title": "সেটিংস",
     "language": "ভাষা",
     "languageEn": "English",
     "languageBn": "বাংলা",
-    "theme": "Theme",
-    "themeDark": "Dark",
-    "themeLight": "Light",
-    "obsPath": "OBS Path",
+    "theme": "থিম",
+    "themeDark": "গাঢ়",
+    "themeLight": "হালকা",
+    "obsPath": "OBS-এর Path",
     "obsPathHint": "obs64.exe-এর Path (OBS Studio 28 বা নতুন)।",
     "obsBrowse": "খুঁজুন…",
-    "obsDetect": "Auto-detect",
+    "obsDetect": "নিজে খুঁজে নিন",
     "obsBrowseTitle": "obs64.exe বেছে নিন"
   },
   "library": {
@@ -42,8 +42,8 @@
   "backup": {
     "title": "Backup ও Restore",
     "hint": "Backup-এ Character, Document আর Settings একটা .zip ফাইলে থাকে। API Key কখনো যায় না।",
-    "backup": "Backup…",
-    "restore": "Restore…",
+    "backup": "Backup নিন…",
+    "restore": "Restore করুন…",
     "pickFolder": "Backup রাখার Folder বেছে নিন",
     "pickFile": "Backup .zip ফাইল বেছে নিন",
     "saved": "Backup সংরক্ষিত: {{file}}",
@@ -52,7 +52,7 @@
     "restoreMessage": "বর্তমান সব Character, Document আর Settings Backup দিয়ে বদলে যাবে।"
   },
   "doc": {
-    "file": "Document",
+    "file": "ডকুমেন্ট",
     "openImage": "ছবি খুলুন…",
     "openImageHint": "JPG বা PNG। একসঙ্গে সর্বোচ্চ ৩টি Document খোলা রাখা যায়।",
     "pickImageTitle": "Document-এর ছবি খুলুন (JPG / PNG)",
@@ -60,10 +60,10 @@
     "chooseSaved": "সংরক্ষিত Document খুলুন…",
     "open": "খুলুন",
     "name": "নাম",
-    "save": "Save",
+    "save": "সংরক্ষণ করুন",
     "saved": "সংরক্ষিত হয়েছে।",
-    "exportPng": "PNG Export",
-    "exportJpg": "JPG Export",
+    "exportPng": "PNG হিসেবে Export",
+    "exportJpg": "JPG হিসেবে Export",
     "exported": "Export হয়েছে: {{file}}",
     "ocr": "লেখা শনাক্তকরণ (OCR)",
     "ocrRunning": "লেখা পড়া হচ্ছে… {{percent}}%",
@@ -80,9 +80,9 @@
     "adjustBoxHint": "Apply-এর আগে Box টেনে সরাতে পারেন, কোণা টেনে Size বদলাতে পারেন। শুধু Box-এর ভেতরের অক্ষরগুলো মোছা হবে।",
     "ocrText": "শনাক্ত লেখা",
     "newText": "নতুন লেখা",
-    "font": "Font",
+    "font": "ফন্ট",
     "autoStyle": "Size, Position আর Color স্বয়ংক্রিয়ভাবে মেলানো হয়।",
-    "apply": "Apply",
+    "apply": "প্রয়োগ করুন",
     "removingOld": "পুরোনো লেখা মোছা হচ্ছে…",
     "imageReplace": "ছবি বদলানো",
     "selectArea": "জায়গা Select করুন",
@@ -91,9 +91,9 @@
     "pickReplaceTitle": "নতুন ছবি বেছে নিন (JPG / PNG)",
     "placedImage": "বসানো ছবি",
     "removeImage": "Select করা ছবি সরান",
-    "history": "Undo / Redo",
-    "undo": "Undo",
-    "redo": "Redo",
+    "history": "আগের অবস্থা / আবার করা",
+    "undo": "আগের অবস্থায় ফিরুন",
+    "redo": "আবার করুন",
     "closeSlot": "Document বন্ধ করুন",
     "slotCount": "{{count}} / {{max}} খোলা",
     "unsavedTitle": "Save না করা পরিবর্তন",
