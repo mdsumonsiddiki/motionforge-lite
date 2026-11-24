@@ -110,7 +110,7 @@ Claude Code প্রতিটা Phase শেষে এখানে একট�
 - Open issues: a matra more than ~25% of the box height above the box is still not reached (adjust the box).
 
 ## Fix — Box move / resize in Undo / Redo (2026-11-24)
-- : history is now  with ;  records a moved/resized OCR box,  keeps the box state. Ctrl+Z / Ctrl+Y undo box changes and layer edits in one order.  stays the recognised boxes;  applies the adjustments;  replaces  in callers.  → , so a box move also counts as an unsaved change. Save writes the adjusted boxes to edits.json (format unchanged).
+- `documentStore`: history is now `History<EditState>` with `EditState = { layers, boxRects }`; `commitBoxRect` records a moved/resized OCR box, `commitLayers` keeps the box state. Ctrl+Z / Ctrl+Y undo box changes and layer edits in one order. `slot.ocr` stays the recognised boxes; `slotBoxes(slot)` applies the adjustments; `slotLayers(slot)` replaces `history.present` in callers. `savedLayers` → `savedEdits`, so a box move also counts as an unsaved change. Save writes the adjusted boxes to edits.json (format unchanged).
 - Tests: typecheck ✅ lint ✅ test ✅ (170; new: box move undo/redo interleaved with a layer edit, dirty state) build ✅.
 - Manual test for user: select a box → drag / resize it → Ctrl+Z (box jumps back) → Ctrl+Y (moved again). Apply text, then Ctrl+Z twice: first the text, then the box move is undone.
 - Open issues: none new.
