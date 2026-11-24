@@ -3,7 +3,7 @@
 // fffiloni/expression-editor (LivePortrait expression editor), saves each result
 // image to docs/screenshots/phase-1/ and records the latency in results.json.
 //
-// Usage: node --env-file-if-exists=.env scripts/feasibility/pose-test.mjs <portrait.jpg> [prefix]
+// Usage: node --env-file-if-exists=.env scripts/feasibility/pose-test.mjs <portrait.jpg> [prefix] [only]
 // HF_TOKEN (free Hugging Face "Read" token) in .env raises the free ZeroGPU quota.
 // Without it the anonymous quota runs out after ~3 calls. The token is never printed.
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
@@ -14,9 +14,12 @@ const SPACE = 'fffiloni/expression-editor'
 const OUT_DIR = 'docs/screenshots/phase-1'
 const TIMEOUT_MS = 120_000
 
-const [, , imagePath, prefix = 'pose'] = process.argv
+// Optional 3rd argument: comma-separated case-name prefixes to run (e.g. "08,09,10"),
+// so a small free quota is spent only on the cases still missing.
+const [, , imagePath, prefix = 'pose', onlyArg = ''] = process.argv
+const only = onlyArg ? onlyArg.split(',').map((x) => x.trim()) : null
 if (!imagePath || !existsSync(imagePath)) {
-  console.error('Usage: node scripts/feasibility/pose-test.mjs <portrait.jpg> [prefix]')
+  console.error('Usage: node scripts/feasibility/pose-test.mjs <portrait.jpg> [prefix] [only]')
   process.exit(1)
 }
 
@@ -68,6 +71,7 @@ const done = new Set(previous.map((r) => r.name))
 
 for (const [name, state] of CASES) {
   if (done.has(name)) continue
+  if (only && !only.some((p) => name.startsWith(p))) continue
   const start = Date.now()
   try {
     const res = await withTimeout(
