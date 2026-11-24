@@ -5,13 +5,21 @@
 - Progress: the "Progress Checklist" at the end of the spec. Update it after each finished phase.
 - Phase log: `PROGRESS_LOG.md`. Append a short entry after each phase (what was built, test results, open issues).
 
+## Communication (permanent rule, overrides any other reporting instruction in this file)
+- Do NOT write explanations or Bengali text in chat. Work silently.
+- After each task, reply in max 3 short English lines: files changed, test result (pass/fail), commit hash.
+- Only write more when blocked, a test fails 3 times, or a decision from the user is needed. Then start the message with "⛔ NEED USER:" and ask one clear question.
+- When blocked (an error you can't fix after 3 tries, a missing key/permission, or a decision needed): write `BLOCKED.md` in the project root with: phase/task, exact error message, file and line, what you tried, what you need from the user. Then stop and reply "⛔ NEED USER: see BLOCKED.md".
+- When the blocker is resolved, delete `BLOCKED.md` and continue.
+- Keep `PROGRESS_LOG.md` and the spec checklist updated after every task (the user's reviewer checks progress there).
+
 ## Talking to the user
-- The user is a MERN developer. Explain in **Bangla**; keep code, file names and technical terms in English.
-- If something in the spec is unclear or contradictory, ask the user. Do not guess.
-- If the user's decision looks risky, warn before doing it.
+- The user is a MERN developer. Keep code, file names and technical terms in English.
+- If something in the spec is unclear or contradictory, ask the user (using the "⛔ NEED USER:" format above). Do not guess.
+- If the user's decision looks risky, warn before doing it (same format).
 
 ## Prerequisite check (start of Phase 0, and whenever a tool seems missing)
-Check each item and show the user a Bangla table: tool, required, found version, OK / missing.
+Check each item and list it in PROGRESS_LOG.md (tool, required, found version, OK / missing); reply only per the Communication rule.
 
 | Tool | Command | Required | When needed |
 |---|---|---|---|
@@ -24,20 +32,20 @@ Check each item and show the user a Bangla table: tool, required, found version,
 | OBS Studio | check `C:\Program Files\obs-studio\bin\64bit\obs64.exe` | 28 or newer | Phase 5 (warn only, don't block earlier phases) |
 
 Rules:
-- Do not install or upgrade anything by yourself. If something is missing, stop and give the user the exact install steps in Bangla (official download link or a `winget install` command they can run), then wait.
+- Do not install or upgrade anything by yourself. If something is missing, stop and write BLOCKED.md with the exact install steps (official download link or a `winget install` command they can run), reply "⛔ NEED USER: see BLOCKED.md", then wait.
 - After the user says it is installed, check again before continuing.
 - Never change the user's global git config without asking.
 
 ## Workflow for every phase
 1. Read the spec section for the phase and `PROGRESS_LOG.md`.
-2. Write a short plan (files to create/change, tests to add) and show it to the user in Bangla.
+2. Write a short plan (files to create/change, tests to add) for yourself; do not post it in chat.
 3. Implement in small steps. Clean code with clear comments.
 4. Delegate verification to the `tester` subagent. Fix failures and re-test, at most 3 rounds. If it still fails, stop and report.
 5. Delegate a spec check to the `spec-reviewer` subagent. Fix real issues.
 6. Check every "Done when" item of the phase.
 7. Update the spec checklist and `PROGRESS_LOG.md`, then `git add -A` and `git commit -m "Phase N: <title>"`.
 8. **Push to GitHub** only if the tester reported PASS: `git push origin main`. Before pushing, run `git status --ignored` and confirm `.env`, `node_modules` and build output are not tracked. If the push fails, report the error and stop (never force-push).
-9. Report to the user in Bangla: what was done, test results, push status (commit link if possible), how to test it manually, anything that needs the user.
+9. Report per the Communication rule (max 3 English lines); manual test steps go in PROGRESS_LOG.md.
 - No screenshots: do not add Playwright or a screenshot script.
 
 ## GitHub
@@ -58,7 +66,7 @@ Rules:
 - Write command output you need later to a file inside the project (e.g. `.tmp/`, add it to `.gitignore`) instead of `$TEMP`, then read it with Read.
 - Avoid shell variables (`$TEMP`, `$HOME`, `%VAR%`) and `env` in Bash commands; they trigger a permission prompt every time. Use literal project-relative paths.
 - Combine checks into one command or one script (`node scripts/check-x.mjs`) rather than many small commands.
-- If you are stuck on the same problem for more than 3 attempts, stop and explain it to the user in Bangla instead of trying more variations.
+- If you are stuck on the same problem for more than 3 attempts, stop and follow the BLOCKED.md rule instead of trying more variations.
 
 ## Debug code
 - Temporary debug code must be marked `// TEMP-DEBUG` and removed before the phase commit. The `spec-reviewer` must fail the review if any `TEMP-DEBUG` remains.
