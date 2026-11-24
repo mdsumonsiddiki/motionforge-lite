@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDocumentStore, type Slot } from '../../store/documentStore'
+import { slotBoxes, slotLayers, useDocumentStore, type Slot } from '../../store/documentStore'
 import { drawSlot } from '../../editor/session'
 import { setLayerRect } from '../../editor/edits'
 import {
@@ -50,6 +50,7 @@ export function DocPreview({
   const { t } = useTranslation()
   const update = useDocumentStore((s) => s.update)
   const commitLayers = useDocumentStore((s) => s.commitLayers)
+  const commitBoxRect = useDocumentStore((s) => s.commitBoxRect)
 
   const boxRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -61,7 +62,7 @@ export function DocPreview({
   /** Live rect of an OCR box while the user moves / resizes it (before Apply). */
   const [draftBox, setDraftBox] = useState<{ id: string; rect: Rect } | null>(null)
 
-  const layers = draftLayers ?? slot.history.present
+  const layers = draftLayers ?? slotLayers(slot)
   const scale = fitScale(slot.width, slot.height, avail.w, avail.h)
 
   // Track the available preview size.
@@ -130,7 +131,7 @@ export function DocPreview({
       return
     }
     const rect = dragRect(drag.startRect, drag.kind, dx, dy)
-    setDraftLayers(setLayerRect(slot.history.present, drag.layerId, rect))
+    setDraftLayers(setLayerRect(slotLayers(slot), drag.layerId, rect))
   }
 
   const onUp = (): void => {
@@ -142,9 +143,7 @@ export function DocPreview({
     } else if (draftBox) {
       // The adjusted box is used by the next Apply (the OCR text stays the same).
       if (draftBox.rect.w >= MIN_LAYER_SIZE && draftBox.rect.h >= MIN_LAYER_SIZE) {
-        update(slot.key, {
-          ocr: slot.ocr.map((b) => (b.id === draftBox.id ? { ...b, rect: draftBox.rect } : b))
-        })
+        commitBoxRect(slot.key, draftBox.id, draftBox.rect) // undoable (Ctrl+Z)
       }
       setDraftBox(null)
     } else if (draftLayers) {
@@ -183,7 +182,7 @@ export function DocPreview({
           {/* OCR boxes (preview outlines). Hidden while selecting an area.
               Uncertain lines (low confidence / mostly symbols) are yellow with a label. */}
           {!selectingArea &&
-            slot.ocr.map((box) => {
+            slotBoxes(slot).map((box) => {
               const uncertain = isUncertain(box)
               const label = uncertain && (
                 <span className="pointer-events-none absolute -top-4 left-0 rounded-sm bg-amber-400 px-1 text-[10px] leading-4 whitespace-nowrap text-black">

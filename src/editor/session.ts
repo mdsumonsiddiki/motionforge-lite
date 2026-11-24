@@ -4,7 +4,7 @@ import type {
   LoadedDocument,
   PickedImage
 } from '../../electron/shared/document'
-import { useDocumentStore, type OpenResult, type Slot } from '../store/documentStore'
+import { slotBoxes, slotLayers, useDocumentStore, type OpenResult, type Slot } from '../store/documentStore'
 import { recognize } from '../workers/ocrClient'
 import { inpaintBox } from '../workers/inpaintClient'
 import { parseEdits, serializeEdits } from './edits'
@@ -161,7 +161,7 @@ export function syncAssets(key: string): void {
   const rt = runtimes.get(key)
   if (!slot || !rt) return
 
-  for (const layer of slot.history.present) {
+  for (const layer of slotLayers(slot)) {
     if (layer.kind === 'text') {
       const id = patchKey(layer)
       if (rt.patches.has(id) || rt.failedPatches.has(id) || rt.pendingPatches.has(id)) continue
@@ -268,7 +268,7 @@ export async function drawSlot(
   const slot = getSlot(key)
   const rt = runtimes.get(key)
   if (!slot || !rt) return
-  const toDraw = layers ?? slot.history.present
+  const toDraw = layers ?? slotLayers(slot)
   await loadFonts(toDraw)
   if (canvas.width !== slot.width) canvas.width = slot.width
   if (canvas.height !== slot.height) canvas.height = slot.height
@@ -301,7 +301,7 @@ export async function saveSlot(key: string): Promise<void> {
     id: slot.docId ?? undefined,
     name: slot.name,
     original: slot.docId ? undefined : slot.original,
-    edits: serializeEdits(slot.ocr, slot.history.present, slot.ocrStatus === 'done'),
+    edits: serializeEdits(slotBoxes(slot), slotLayers(slot), slot.ocrStatus === 'done'),
     editedPng
   })
   store().markSaved(key, meta)

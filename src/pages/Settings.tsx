@@ -95,7 +95,7 @@ function BackupRestore() {
         // Open documents may no longer exist on disk: treat them as new, unsaved documents.
         const docs = useDocumentStore.getState()
         for (const s of docs.slots) {
-          if (s.docId) docs.update(s.key, { docId: null, savedLayers: null, savedName: null })
+          if (s.docId) docs.update(s.key, { docId: null, savedEdits: null, savedName: null })
         }
         setStatus(t('backup.restored'))
       }

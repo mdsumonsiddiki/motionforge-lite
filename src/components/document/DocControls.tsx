@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ExportFormat } from '../../../electron/shared/document'
-import { useDocumentStore, type Slot } from '../../store/documentStore'
+import { slotBoxes, slotLayers, useDocumentStore, type Slot } from '../../store/documentStore'
 import { useLibraryStore } from '../../store/libraryStore'
 import { notify } from '../../store/toastStore'
 import { canRedo, canUndo } from '../../editor/history'
@@ -52,7 +52,7 @@ function TextEditor({
   inpainting: boolean
 }) {
   const { t } = useTranslation()
-  const [draft, setDraft] = useState(() => textForBox(slot.history.present, box))
+  const [draft, setDraft] = useState(() => textForBox(slotLayers(slot), box))
   const [applying, setApplying] = useState(false)
 
   /**
@@ -67,7 +67,7 @@ function TextEditor({
       const { slots, commitLayers } = useDocumentStore.getState()
       const current = slots.find((s) => s.key === slot.key)
       if (!current) return
-      commitLayers(slot.key, applyTextEdit(current.history.present, box, draft, style))
+      commitLayers(slot.key, applyTextEdit(slotLayers(current), box, draft, style))
       syncAssets(slot.key)
     } finally {
       setApplying(false)
@@ -146,8 +146,8 @@ export function DocControls({
     void loadFontList().then(setFonts)
   }, [])
 
-  const layers = slot.history.present
-  const box = slot.ocr.find((b) => b.id === slot.selectedBoxId) ?? null
+  const layers = slotLayers(slot)
+  const box = slotBoxes(slot).find((b) => b.id === slot.selectedBoxId) ?? null
   const selectedImage = layers.find((l) => l.id === slot.selectedLayerId && l.kind === 'image')
 
   const withBusy = async (fn: () => Promise<void>, errorKey: string): Promise<void> => {

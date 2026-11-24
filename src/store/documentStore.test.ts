@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { isDirty, useDocumentStore, type NewSlotInput } from './documentStore'
+import { isDirty, slotBoxes, slotLayers, useDocumentStore, type NewSlotInput } from './documentStore'
 import type { Layer } from '../editor/types'
 
 const input = (over: Partial<NewSlotInput> = {}): NewSlotInput => ({
@@ -59,15 +59,37 @@ describe('documentStore', () => {
     store().commitLayers(r.key, [imageLayer])
     expect(isDirty(slot(r.key))).toBe(true)
     store().undo(r.key)
-    expect(slot(r.key).history.present).toEqual([])
+    expect(slotLayers(slot(r.key))).toEqual([])
     expect(isDirty(slot(r.key))).toBe(false)
     store().redo(r.key)
-    expect(slot(r.key).history.present).toEqual([imageLayer])
+    expect(slotLayers(slot(r.key))).toEqual([imageLayer])
 
     store().markSaved(r.key, { id: 'd1', name: 'Doc', createdAt: 'a', updatedAt: 'b' })
     expect(isDirty(slot(r.key))).toBe(false)
     store().update(r.key, { name: 'Renamed' })
     expect(isDirty(slot(r.key))).toBe(true)
+  })
+
+  it('box move / resize goes through undo / redo together with layer edits', () => {
+    const box = { id: 'b1', rect: { x: 1, y: 2, w: 30, h: 10 }, text: 'Hi', confidence: 90 }
+    const r = store().openSlot(input({ docId: 'd1', ocr: [box] }))
+    if (r.status !== 'opened') throw new Error('expected opened')
+    const moved = { x: 5, y: 0, w: 40, h: 14 }
+
+    store().commitBoxRect(r.key, 'b1', moved)
+    expect(slotBoxes(slot(r.key))[0]?.rect).toEqual(moved)
+    expect(slot(r.key).ocr[0]?.rect).toEqual(box.rect) // recognised box is kept
+    expect(isDirty(slot(r.key))).toBe(true)
+
+    store().commitLayers(r.key, [imageLayer])
+    store().undo(r.key) // undoes the layer, box stays moved
+    expect(slotLayers(slot(r.key))).toEqual([])
+    expect(slotBoxes(slot(r.key))[0]?.rect).toEqual(moved)
+    store().undo(r.key) // undoes the box move
+    expect(slotBoxes(slot(r.key))[0]?.rect).toEqual(box.rect)
+    expect(isDirty(slot(r.key))).toBe(false)
+    store().redo(r.key)
+    expect(slotBoxes(slot(r.key))[0]?.rect).toEqual(moved)
   })
 
   it('a never-saved document counts as unsaved', () => {

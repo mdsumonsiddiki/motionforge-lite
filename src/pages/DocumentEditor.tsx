@@ -7,7 +7,7 @@ import { SlotTabs } from '../components/document/SlotTabs'
 import { addImageLayer } from '../editor/edits'
 import { syncAssets } from '../editor/session'
 import type { Rect } from '../editor/types'
-import { useActiveSlot, useDocumentStore } from '../store/documentStore'
+import { slotLayers, useActiveSlot, useDocumentStore } from '../store/documentStore'
 import { notify } from '../store/toastStore'
 
 /** Max size of a replacement picture (it is embedded in edits.json as base64). */
@@ -74,7 +74,7 @@ export function DocumentEditor() {
       const { slots, commitLayers, update } = useDocumentStore.getState()
       const current = slots.find((s) => s.key === slot.key)
       if (!current) return
-      const layers = addImageLayer(current.history.present, rect, dataUrl)
+      const layers = addImageLayer(slotLayers(current), rect, dataUrl)
       commitLayers(slot.key, layers)
       update(slot.key, { selectedLayerId: layers[layers.length - 1]?.id ?? null, selectedBoxId: null })
       syncAssets(slot.key)

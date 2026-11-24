@@ -53,7 +53,7 @@ export function SavedList({ kind, items }: { kind: ItemKind; items: ItemSummary[
             if (kind === 'documents' && open) {
               useDocumentStore
                 .getState()
-                .update(open.key, { docId: null, savedLayers: null, savedName: null })
+                .update(open.key, { docId: null, savedEdits: null, savedName: null })
             }
           }
           setPending(null)
