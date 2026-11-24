@@ -13,7 +13,8 @@ function settingsFilePath(): string {
 /** Cached in memory after the first read; disk is written only when the user changes something. */
 let current: Settings | null = null
 
-function getSettings(): Settings {
+/** Current settings (read from disk once, then cached). */
+export function getSettings(): Settings {
   if (!current) current = loadSettings(settingsFilePath(), detectObsPath() ?? DEFAULT_OBS_PATH)
   return current
 }

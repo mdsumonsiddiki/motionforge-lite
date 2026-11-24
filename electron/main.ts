@@ -5,6 +5,8 @@ import { IPC } from './shared/ipc'
 import { registerSettingsIpc } from './ipc/settings'
 import { registerStorageIpc } from './ipc/storage'
 import { registerDocumentIpc } from './ipc/document'
+import { registerObsIpc } from './ipc/obs'
+import { registerOutputIpc } from './windows/outputWindow'
 import { APP_HOST, APP_INDEX_URL, APP_SCHEME, resolveAppFile } from './services/appProtocol'
 
 // Must run before `app.whenReady()`: the built renderer is served from app://bundle/.
@@ -120,7 +122,9 @@ app.whenReady().then(() => {
   registerSettingsIpc()
   registerStorageIpc()
   registerDocumentIpc()
-  createMainWindow()
+  registerObsIpc()
+  const mainWindow = createMainWindow()
+  registerOutputIpc(mainWindow, app.isPackaged ? undefined : process.env['ELECTRON_RENDERER_URL'])
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createMainWindow()

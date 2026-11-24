@@ -12,6 +12,7 @@ import { Settings } from './pages/Settings'
 import { WebcamOutput } from './pages/WebcamOutput'
 import { useNavStore, type Page } from './store/navStore'
 import { useSettingsStore } from './store/settingsStore'
+import { useOutputSync } from './output/useOutputSync'
 
 const PAGES: Record<Page, ComponentType> = {
   dashboard: Dashboard,
@@ -27,6 +28,9 @@ export default function App() {
   const page = useNavStore((s) => s.page)
   const settings = useSettingsStore((s) => s.settings)
   const load = useSettingsStore((s) => s.load)
+
+  // Keep the Webcam Output window in sync with the controls and open documents.
+  useOutputSync()
 
   // Load saved settings once (theme and language survive a restart).
   useEffect(() => {

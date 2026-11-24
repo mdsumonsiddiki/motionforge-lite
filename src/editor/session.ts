@@ -239,6 +239,11 @@ async function renderBytes(key: string, format: ExportFormat): Promise<Uint8Arra
   return new Uint8Array(await blob.arrayBuffer())
 }
 
+/** The current result as PNG bytes (used by Webcam Output). */
+export function renderSlotPng(key: string): Promise<Uint8Array> {
+  return renderBytes(key, 'png')
+}
+
 /** Saves edits.json + edited.png (and the original, for a new document). */
 export async function saveSlot(key: string): Promise<void> {
   const slot = getSlot(key)

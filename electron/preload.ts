@@ -8,6 +8,7 @@ import type {
   PickedImage,
   SaveDocumentRequest
 } from './shared/document'
+import type { Orientation, OutputState } from './shared/output'
 
 /**
  * Safe IPC bridge exposed to the renderer as `window.api`.
@@ -55,6 +56,38 @@ const api = {
     save: (req: SaveDocumentRequest): Promise<DocumentMeta> => ipcRenderer.invoke(IPC.docSave, req),
     /** Save dialog + write. Returns the written path, or null if cancelled. */
     export: (req: ExportRequest): Promise<string | null> => ipcRenderer.invoke(IPC.docExport, req)
+  },
+
+  obsControl: {
+    /** Starts OBS from the saved OBS path. */
+    launch: (): Promise<'launched' | 'empty' | 'notObs' | 'missing' | 'failed'> =>
+      ipcRenderer.invoke(IPC.obsLaunch),
+    /** Asks OBS to close normally (never force-killed). */
+    close: (): Promise<'closing' | 'notRunning' | 'failed'> => ipcRenderer.invoke(IPC.obsClose)
+  },
+
+  output: {
+    // ---- used by the main window ----
+    open: (orientation: Orientation): Promise<boolean> =>
+      ipcRenderer.invoke(IPC.outputOpen, orientation),
+    close: (): Promise<void> => ipcRenderer.invoke(IPC.outputClose),
+    isOpen: (): Promise<boolean> => ipcRenderer.invoke(IPC.outputIsOpen),
+    setOrientation: (orientation: Orientation): Promise<void> =>
+      ipcRenderer.invoke(IPC.outputOrientation, orientation),
+    sendState: (state: OutputState): void => ipcRenderer.send(IPC.outputState, state),
+    /** Output window opened / closed. Returns an unsubscribe function. */
+    onStatus: (callback: (open: boolean) => void): (() => void) => {
+      const listener = (_e: Electron.IpcRendererEvent, open: boolean): void => callback(open)
+      ipcRenderer.on(IPC.outputStatus, listener)
+      return () => ipcRenderer.removeListener(IPC.outputStatus, listener)
+    },
+    // ---- used by the output window ----
+    getState: (): Promise<OutputState | null> => ipcRenderer.invoke(IPC.outputGetState),
+    onState: (callback: (state: OutputState) => void): (() => void) => {
+      const listener = (_e: Electron.IpcRendererEvent, state: OutputState): void => callback(state)
+      ipcRenderer.on(IPC.outputState, listener)
+      return () => ipcRenderer.removeListener(IPC.outputState, listener)
+    }
   },
 
   app: {

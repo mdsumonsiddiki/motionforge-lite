@@ -9,9 +9,11 @@ import '@fontsource/noto-sans/400.css'
 import '@fontsource/noto-serif/400.css'
 import './index.css'
 import App from './App'
+import { OutputApp } from './output/OutputApp'
+
+// The same bundle runs in two windows: the main app, and the Webcam Output window (#output).
+const isOutputWindow = window.location.hash === '#output'
 
 createRoot(document.getElementById('root') as HTMLElement).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
+  <StrictMode>{isOutputWindow ? <OutputApp /> : <App />}</StrictMode>
 )
