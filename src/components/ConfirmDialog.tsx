@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { Btn } from '../shell/ui'
 
 type Props = {
   open: boolean
@@ -13,6 +14,7 @@ type Props = {
 /**
  * Reusable modal confirmation (App close, Delete, Restore).
  * The confirm button is styled as destructive; Escape or Cancel closes it.
+ * Look: UI_REDESIGN.md tokens (raised solid panel, 3D buttons).
  */
 export function ConfirmDialog({
   open,
@@ -35,33 +37,44 @@ export function ConfirmDialog({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 50,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(0,0,0,0.5)'
+      }}
+    >
       <div
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="confirm-title"
-        className="w-96 rounded-xl bg-white p-6 shadow-xl dark:bg-neutral-800"
+        className="as-raise"
+        style={{
+          width: 384,
+          borderRadius: 24,
+          background: 'var(--panel-solid)',
+          border: '1px solid var(--border)',
+          color: 'var(--text)',
+          padding: 24
+        }}
       >
-        <h2 id="confirm-title" className="text-lg font-semibold">
+        <h2 id="confirm-title" style={{ margin: 0, fontSize: 18, fontWeight: 600 }}>
           {title}
         </h2>
-        <p className="mt-2 text-sm break-words text-neutral-600 dark:text-neutral-300">{message}</p>
-        <div className="mt-6 flex justify-end gap-2">
-          <button
-            type="button"
-            autoFocus
-            onClick={onCancel}
-            className="rounded-md px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700"
-          >
+        <p style={{ margin: '8px 0 0', fontSize: 13, lineHeight: 1.5, color: 'var(--muted)', overflowWrap: 'anywhere' }}>
+          {message}
+        </p>
+        <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+          <Btn tone="solid" autoFocus onClick={onCancel} style={{ minHeight: 42, padding: '0 16px', borderRadius: 12 }}>
             {cancelLabel}
-          </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            className="rounded-md bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
-          >
+          </Btn>
+          <Btn tone="danger" onClick={onConfirm} style={{ minHeight: 42, padding: '0 16px', borderRadius: 12 }}>
             {confirmLabel}
-          </button>
+          </Btn>
         </div>
       </div>
     </div>

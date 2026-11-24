@@ -3,8 +3,34 @@
     "name": "MotionForge Lite"
   },
   "nav": {
-    "back": "Dashboard-এ ফিরুন",
-    "settings": "সেটিংস"
+    "main": "মূল মেনু",
+    "home": "হোম",
+    "studios": "স্টুডিও",
+    "human": "Human Studio",
+    "document": "Document Editor",
+    "output": "Webcam Output",
+    "settings": "সেটিংস",
+    "controls": "নিয়ন্ত্রণ",
+    "toggleSidebar": "মেনু ছোট বা বড় করুন",
+    "toggleTheme": "লাইট বা ডার্ক মোড বদলান"
+  },
+  "obs": {
+    "offline": "OBS · বন্ধ",
+    "running": "OBS · চলছে",
+    "live": "OBS · LIVE"
+  },
+  "power": {
+    "button": "পাওয়ার: আবার চালু বা বন্ধ",
+    "menu": "পাওয়ার",
+    "restartApp": "App আবার চালু করুন",
+    "quitApp": "App বন্ধ করুন",
+    "hint": "Save না করা কাজ থাকলে আগে জিজ্ঞেস করা হবে। OBS চলতে থাকবে।",
+    "restartTitle": "MotionForge Lite আবার চালু করবেন?",
+    "restartMessage": "App বন্ধ হয়ে আবার খুলবে।",
+    "restartUnsavedMessage": "কিছু খোলা Document-এ Save না করা পরিবর্তন আছে। তবুও App আবার চালু করবেন?",
+    "restart": "আবার চালু করুন",
+    "restartWithoutSaving": "Save না করে আবার চালু করুন",
+    "outputWillClose": "Output Window-ও বন্ধ হয়ে যাবে।"
   },
   "dashboard": {
     "human": "Human Studio",

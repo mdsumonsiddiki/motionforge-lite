@@ -3,6 +3,7 @@ import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { loadSettings, saveSettings } from './settingsFile'
+import { defaultSettings, type Settings } from '../shared/settings'
 
 describe('settingsFile', () => {
   let dir: string
@@ -15,44 +16,34 @@ describe('settingsFile', () => {
   afterEach(() => rmSync(dir, { recursive: true, force: true }))
 
   it('returns defaults when the file is missing', () => {
-    expect(loadSettings(file, 'C:\\obs.exe')).toEqual({
-      language: 'en',
-      theme: 'dark',
-      obsPath: 'C:\\obs.exe',
-      reduceEffects: false
-    })
+    expect(loadSettings(file, 'C:\\obs.exe')).toEqual(defaultSettings('C:\\obs.exe'))
   })
 
   it('round-trips saved settings (survives a restart)', () => {
-    saveSettings(file, {
+    const saved: Settings = {
       language: 'bn',
       theme: 'light',
       obsPath: 'D:\\obs.exe',
-      reduceEffects: true
-    })
+      reduceEffects: true,
+      sidebarCollapsed: true
+    }
+    saveSettings(file, saved)
     expect(existsSync(`${file}.tmp`)).toBe(false)
-    expect(loadSettings(file, 'C:\\obs.exe')).toEqual({
-      language: 'bn',
-      theme: 'light',
-      obsPath: 'D:\\obs.exe',
-      reduceEffects: true
-    })
+    expect(loadSettings(file, 'C:\\obs.exe')).toEqual(saved)
   })
 
   it('falls back to defaults on a corrupt file', () => {
-    saveSettings(file, { language: 'bn', theme: 'light', obsPath: 'x', reduceEffects: false })
+    saveSettings(file, { ...defaultSettings('x'), language: 'bn', theme: 'light' })
     writeFileSync(file, '{ not json', 'utf8')
     expect(loadSettings(file, 'C:\\obs.exe').language).toBe('en')
   })
 
   it('ignores invalid fields in the file', () => {
-    saveSettings(file, { language: 'bn', theme: 'light', obsPath: 'x', reduceEffects: false })
+    saveSettings(file, { ...defaultSettings('x'), language: 'bn', theme: 'light' })
     writeFileSync(file, JSON.stringify({ language: 'de', theme: 'light' }), 'utf8')
     expect(loadSettings(file, 'C:\\obs.exe')).toEqual({
-      language: 'en',
-      theme: 'light',
-      obsPath: 'C:\\obs.exe',
-      reduceEffects: false
+      ...defaultSettings('C:\\obs.exe'),
+      theme: 'light'
     })
   })
 })

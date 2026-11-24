@@ -132,3 +132,12 @@ Claude Code প্রতিটা Phase শেষে এখানে একট�
 - Form fields: border `var(--input-border)` and focus ring 2px #8b5cf6, offset 3px, in both themes.
 - Tests: new `styles/tokens.test.ts` (text / muted ≥ 4.5:1 on every surface, accent / on-accent ≥ 4.5:1, input border + focus ring ≥ 3:1, both themes); `styles.test.ts` now checks both themes; settings validation + persistence for `reduceEffects`. typecheck ✅ lint ✅ test ✅ (180) build ✅.
 - Manual test for user: Settings → Theme Light / Dark → text font is Poppins; Reduce effects On → restart → still On.
+
+## UI Redesign — Step 2: shell layout (2026-11-25, branch `ui-redesign`)
+- `src/shell/`: `Shell` (20px page padding, 28px rounded glass shell, sidebar | navbar + center + right-panel slot, flex-wrap), `Sidebar` (logo, Home · STUDIOS · Human Studio · Document Editor · Webcam Output, Settings at the bottom; 244 ↔ 88px with `transition: flex-basis .25s`, labels hidden when collapsed), `Navbar` (☰, title block, OBS pill, EN / বাংলা, theme toggle, power), `PowerMenu`, `ObsPill` (Offline now; Running / LIVE styles ready), `icons.tsx`, `ui.tsx` (Btn / Card / Sink / Chip helpers). All sizes and colours from the reference.
+- Routing: `navStore` pages `home | human | document | output | settings`, opens on Home (Home shows the old Dashboard until step 4). Old `AppHeader` / `Logo` removed.
+- New setting `sidebarCollapsed` (validated, persisted → survives a restart). Window min size 1100×700.
+- Power menu: Restart app / Quit app → `CloseConfirmDialog` (now also used for window ✕) runs the existing unsaved-documents check and warns when the Output window is open. Restart = new IPC `app:restart` (sender-checked; `app.relaunch(); app.exit(0)`), Quit = existing `app:confirm-close`. ConfirmDialog re-skinned with the new tokens.
+- Note: the reference hint "Unsaved work is saved first" does not match the app (no auto-save; the user is asked). Copy used: "You are asked about unsaved work first. OBS keeps running." — waiting for user confirmation.
+- Tests: `shell/exitText.test.ts` (close / quit / restart texts, unsaved + Output warnings), settings validation for `sidebarCollapsed`, nav pages. typecheck ✅ lint ✅ test ✅ (185) build ✅.
+- Manual test for user: ☰ collapses the sidebar → restart → still collapsed; EN / বাংলা and ☀ / 🌙 in the navbar switch and persist; Power → Restart app with an unsaved document → dialog → Restart without saving → app reopens; Power → Quit app with the Output window open → warning mentions the Output window.

@@ -15,6 +15,8 @@ export type Settings = {
   obsPath: string
   /** Turns off glass blur, hover lift and pulsing (UI_REDESIGN.md section 3). Default off. */
   reduceEffects: boolean
+  /** Sidebar collapsed to icons only (UI_REDESIGN.md section 4.1). Default expanded. */
+  sidebarCollapsed: boolean
 }
 
 export const LANGUAGES: readonly Language[] = ['en', 'bn']
@@ -22,7 +24,7 @@ export const THEMES: readonly Theme[] = ['dark', 'light']
 
 /** Default language is English (spec section 3). */
 export function defaultSettings(obsPath: string): Settings {
-  return { language: 'en', theme: 'dark', obsPath, reduceEffects: false }
+  return { language: 'en', theme: 'dark', obsPath, reduceEffects: false, sidebarCollapsed: false }
 }
 
 /** Max length for a stored path; anything longer is treated as invalid. */
@@ -45,6 +47,7 @@ export function pickValidSettings(patch: unknown): Partial<Settings> {
     out.obsPath = patch.obsPath.trim()
   }
   if (typeof patch.reduceEffects === 'boolean') out.reduceEffects = patch.reduceEffects
+  if (typeof patch.sidebarCollapsed === 'boolean') out.sidebarCollapsed = patch.sidebarCollapsed
   return out
 }
 

@@ -3,8 +3,34 @@
     "name": "MotionForge Lite"
   },
   "nav": {
-    "back": "Back to Dashboard",
-    "settings": "Settings"
+    "main": "Main",
+    "home": "Home",
+    "studios": "STUDIOS",
+    "human": "Human Studio",
+    "document": "Document Editor",
+    "output": "Webcam Output",
+    "settings": "Settings",
+    "controls": "Controls",
+    "toggleSidebar": "Collapse or expand menu",
+    "toggleTheme": "Switch light or dark mode"
+  },
+  "obs": {
+    "offline": "OBS · Offline",
+    "running": "OBS · Running",
+    "live": "OBS · LIVE"
+  },
+  "power": {
+    "button": "Power: restart or quit",
+    "menu": "Power",
+    "restartApp": "Restart app",
+    "quitApp": "Quit app",
+    "hint": "You are asked about unsaved work first. OBS keeps running.",
+    "restartTitle": "Restart MotionForge Lite?",
+    "restartMessage": "The app will close and open again.",
+    "restartUnsavedMessage": "Some open documents have changes that are not saved. Restart the app anyway?",
+    "restart": "Restart",
+    "restartWithoutSaving": "Restart without saving",
+    "outputWillClose": "The Output window will close too."
   },
   "dashboard": {
     "human": "Human Studio",

@@ -21,6 +21,10 @@ function get(obj: object, key: string): unknown {
  */
 const ENGLISH_OK = new Set([
   'app.name',
+  'nav.human',
+  'nav.document',
+  'nav.output',
+  'obs.live',
   'dashboard.human',
   'dashboard.document',
   'dashboard.output',

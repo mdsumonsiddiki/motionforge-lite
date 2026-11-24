@@ -49,8 +49,9 @@ function createMainWindow(): BrowserWindow {
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
-    minWidth: 900,
-    minHeight: 600,
+    // UI_REDESIGN.md section 4: window min size 1100×700.
+    minWidth: 1100,
+    minHeight: 700,
     title: 'MotionForge Lite',
     show: false,
     autoHideMenuBar: true,
@@ -112,8 +113,20 @@ function setupCloseConfirmation(win: BrowserWindow): void {
     closeConfirmed = true
     win.close()
   }
+  // Power menu → "Restart app" (UI_REDESIGN.md 4.2). The renderer already ran the
+  // unsaved-changes check, so the app restarts without asking again.
+  const onRestart = (event: Electron.IpcMainEvent): void => {
+    if (event.sender !== win.webContents) return
+    closeConfirmed = true
+    app.relaunch()
+    app.exit(0)
+  }
   ipcMain.on(IPC.appConfirmClose, onConfirm)
-  win.on('closed', () => ipcMain.off(IPC.appConfirmClose, onConfirm))
+  ipcMain.on(IPC.appRestart, onRestart)
+  win.on('closed', () => {
+    ipcMain.off(IPC.appConfirmClose, onConfirm)
+    ipcMain.off(IPC.appRestart, onRestart)
+  })
 }
 
 app.whenReady().then(() => {

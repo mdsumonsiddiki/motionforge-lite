@@ -1,6 +1,6 @@
 import { useEffect, type ComponentType } from 'react'
+import { useTranslation } from 'react-i18next'
 import i18n from './i18n'
-import { AppHeader } from './components/AppHeader'
 import { CloseConfirmDialog } from './components/CloseConfirmDialog'
 import { Toaster } from './components/Toaster'
 import { Dashboard } from './pages/Dashboard'
@@ -11,17 +11,26 @@ import { WebcamOutput } from './pages/WebcamOutput'
 import { useNavStore, type Page } from './store/navStore'
 import { useSettingsStore } from './store/settingsStore'
 import { useOutputSync } from './output/useOutputSync'
+import { Shell } from './shell/Shell'
+import { ObsPill } from './shell/ObsPill'
 
-const PAGES: Record<Page, ComponentType> = {
-  dashboard: Dashboard,
-  human: HumanStudio,
-  document: DocumentEditor,
-  output: WebcamOutput,
-  settings: Settings
+/**
+ * Sections (UI_REDESIGN.md section 5): center workspace + optional right control panel.
+ * Pages are moved into the center / right slots step by step (work order section 7).
+ */
+type Section = { titleKey: string; center: ComponentType; right?: ComponentType }
+
+const SECTIONS: Record<Page, Section> = {
+  home: { titleKey: 'nav.home', center: Dashboard },
+  human: { titleKey: 'nav.human', center: HumanStudio },
+  document: { titleKey: 'nav.document', center: DocumentEditor },
+  output: { titleKey: 'nav.output', center: WebcamOutput },
+  settings: { titleKey: 'nav.settings', center: Settings }
 }
 
-/** App shell: header + current page + toasts + close confirmation. */
+/** App root: shell + current section + toasts + close / quit / restart confirmation. */
 export default function App() {
+  const { t } = useTranslation()
   const page = useNavStore((s) => s.page)
   const settings = useSettingsStore((s) => s.settings)
   const load = useSettingsStore((s) => s.load)
@@ -29,7 +38,7 @@ export default function App() {
   // Keep the Webcam Output window in sync with the controls and open documents.
   useOutputSync()
 
-  // Load saved settings once (theme and language survive a restart).
+  // Load saved settings once (theme, language and sidebar state survive a restart).
   useEffect(() => {
     void load()
   }, [load])
@@ -40,6 +49,7 @@ export default function App() {
   const reduceEffects = settings?.reduceEffects ?? false
   useEffect(() => {
     const root = document.documentElement
+    // `dark` class: Tailwind dark variant for screens not yet re-skinned.
     root.classList.toggle('dark', theme === 'dark')
     // Theme tokens + depth classes (src/styles/tokens.css).
     root.dataset.theme = theme
@@ -52,16 +62,20 @@ export default function App() {
     document.documentElement.lang = language
   }, [language])
 
-  const CurrentPage = PAGES[page]
+  const section = SECTIONS[page]
+  const Center = section.center
+  const Right = section.right
 
   return (
-    <div className="flex h-full flex-col bg-white text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100">
-      <AppHeader />
-      <main className="min-h-0 flex-1 overflow-auto">
-        <CurrentPage />
-      </main>
+    <>
+      <Shell
+        title={t(section.titleKey)}
+        obsPill={<ObsPill status="offline" />}
+        center={<Center />}
+        right={Right ? <Right /> : undefined}
+      />
       <Toaster />
       <CloseConfirmDialog />
-    </div>
+    </>
   )
 }

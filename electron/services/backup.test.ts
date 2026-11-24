@@ -13,6 +13,7 @@ import { join } from 'node:path'
 import { ZipArchive } from 'archiver'
 import { createWriteStream } from 'node:fs'
 import { backupFileName, BackupError, createBackup, restoreBackup } from './backup'
+import { defaultSettings } from '../shared/settings'
 import { Storage } from './storage'
 import { saveSettings, loadSettings } from './settingsFile'
 
@@ -57,10 +58,9 @@ describe('backup / restore', () => {
     })
     const doc = storage.saveDocument({ name: 'Bill', files: { 'original.jpg': Buffer.from('o') } })
     saveSettings(join(userData, 'settings.json'), {
+      ...defaultSettings('x'),
       language: 'bn',
-      theme: 'light',
-      obsPath: 'x',
-      reduceEffects: false
+      theme: 'light'
     })
     // A file that must NOT go into the backup (e.g. future encrypted API key).
     writeFileSync(join(userData, 'secret.bin'), 'key')
@@ -115,10 +115,9 @@ describe('backup / restore', () => {
     await createBackup(userData, zip)
     storage.saveDocument({ name: 'Current' })
     saveSettings(join(userData, 'settings.json'), {
+      ...defaultSettings('x'),
       language: 'bn',
-      theme: 'light',
-      obsPath: 'x',
-      reduceEffects: false
+      theme: 'light'
     })
 
     // Fail on the first move from staging into userData (after current data was moved aside).

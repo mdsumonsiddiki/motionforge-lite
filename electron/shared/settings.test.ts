@@ -9,7 +9,8 @@ describe('settings validation', () => {
       language: 'en',
       theme: 'dark',
       obsPath: 'C:\\obs\\obs64.exe',
-      reduceEffects: false
+      reduceEffects: false,
+      sidebarCollapsed: false
     })
   })
 
@@ -23,13 +24,24 @@ describe('settings validation', () => {
 
   it('drops unknown keys and invalid values', () => {
     expect(
-      pickValidSettings({ language: 'fr', theme: 1, obsPath: 5, apiKey: 'x', reduceEffects: 'yes' })
+      pickValidSettings({
+        language: 'fr',
+        theme: 1,
+        obsPath: 5,
+        apiKey: 'x',
+        reduceEffects: 'yes',
+        sidebarCollapsed: 1
+      })
     ).toEqual({})
     expect(pickValidSettings({ obsPath: 'a'.repeat(2000) })).toEqual({})
   })
 
   it('keeps Reduce effects (boolean only)', () => {
     expect(pickValidSettings({ reduceEffects: true })).toEqual({ reduceEffects: true })
+  })
+
+  it('keeps the sidebar collapsed state (boolean only)', () => {
+    expect(pickValidSettings({ sidebarCollapsed: true })).toEqual({ sidebarCollapsed: true })
   })
 
   it('handles non-object input', () => {

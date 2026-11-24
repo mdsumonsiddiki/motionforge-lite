@@ -56,12 +56,7 @@ describe('settingsStore', () => {
       set: async () => saved
     })
     await useSettingsStore.getState().load()
-    expect(useSettingsStore.getState().settings).toEqual({
-      language: 'en',
-      theme: 'dark',
-      obsPath: '',
-      reduceEffects: false
-    })
+    expect(useSettingsStore.getState().settings).toEqual(defaultSettings(''))
     expect(useToastStore.getState().toasts[0]?.messageKey).toBe('errors.settingsLoad')
   })
 

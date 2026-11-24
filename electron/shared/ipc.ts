@@ -27,5 +27,7 @@ export const IPC = {
   /** main → renderer: the user tried to close the main window */
   appCloseRequested: 'app:close-requested',
   /** renderer → main: the user confirmed closing */
-  appConfirmClose: 'app:confirm-close'
+  appConfirmClose: 'app:confirm-close',
+  /** renderer → main: the user confirmed "Restart app" (power menu, UI_REDESIGN.md 4.2) */
+  appRestart: 'app:restart'
 } as const

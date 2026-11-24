@@ -97,7 +97,10 @@ const api = {
       ipcRenderer.on(IPC.appCloseRequested, listener)
       return () => ipcRenderer.removeListener(IPC.appCloseRequested, listener)
     },
-    confirmClose: (): void => ipcRenderer.send(IPC.appConfirmClose)
+    /** Close / quit the app for real (after the user confirmed). */
+    confirmClose: (): void => ipcRenderer.send(IPC.appConfirmClose),
+    /** Restart the app (after the user confirmed). */
+    restart: (): void => ipcRenderer.send(IPC.appRestart)
   }
 } as const
 
