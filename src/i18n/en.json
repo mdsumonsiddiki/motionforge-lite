@@ -48,6 +48,26 @@
     "backupText": "All documents and characters in one file. Restore on any PC.",
     "backupNow": "Back up now"
   },
+  "human": {
+    "previewChip": "Preview · 720p",
+    "noCharacter": "No character yet",
+    "noCharacterHint": "Upload a face photo or describe one in the right panel.",
+    "comingSoon": "Coming soon (Phase 6–8)",
+    "savedChip": "Saved characters: {{count}}",
+    "headLimitChip": "Head turn limit: ±20°",
+    "character": "Character",
+    "uploadPhoto": "Upload photo",
+    "generate": "Generate",
+    "poseExpression": "Pose & Expression",
+    "headTurn": "Head turn (left / right)",
+    "headTilt": "Head tilt (up / down)",
+    "eyes": "Eyes (open / closed)",
+    "smile": "Smile",
+    "zoom": "Zoom",
+    "textCommand": "Text command",
+    "textCommandPlaceholder": "e.g. smile and look left",
+    "saveCharacter": "Save character"
+  },
   "common": {
     "comingSoon": "Coming soon"
   },
@@ -90,9 +110,6 @@
     "documentDesc": "Edit text and images in document photos",
     "output": "Webcam Output",
     "outputDesc": "Show a Human or Document in a window for OBS"
-  },
-  "pages": {
-    "comingSoon": "This section will be built in a later phase."
   },
   "settings": {
     "title": "Settings",

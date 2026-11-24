@@ -173,3 +173,10 @@ Claude Code প্রতিটা Phase শেষে এখানে একট�
 - i18n: new output / home strings in en + bn; the remaining English-only Bangla Webcam Output strings (Output Window, Zoom In, Background, Original, …) are now translated (open issue from the i18n task).
 - Tests: `obs.test.ts` running-check command + tasklist parsing; i18n allow-list shrunk. typecheck ✅ lint ✅ test ✅ (197) build ✅.
 - Manual test for user: Webcam Output → preview shows the open document; switch Green / Custom → preview + chip change; zoom / arrows move the preview like the Output window; Launch OBS → pill turns "OBS · Running" within ~3 s; Close OBS → "OBS · Offline".
+
+## UI Redesign — Step 7: Human Studio placeholder (2026-11-25, branch `ui-redesign`)
+- Center: sunken stage (min 480px, radius 26) with "Preview · 720p" chip, dashed silhouette, "No character yet" + hint, "Coming soon (Phase 6–8)"; chips "Saved characters: N" (real count) and "Head turn limit: ±20°".
+- Right panel: Character (Upload photo, Generate), Pose & Expression sliders (Head turn ±20, Head tilt ±20, Eyes, Smile, Zoom 50–150), Text command, Save character — all disabled with "Coming soon (Phase 6–8)". No Phase 6 logic added.
+- Old `PlaceholderPage` and the unused `pages.comingSoon` string removed. en + bn strings added.
+- typecheck ✅ lint ✅ test ✅ (197) build ✅.
+- Manual test for user: Human Studio → every control is greyed out and cannot be used; both themes.

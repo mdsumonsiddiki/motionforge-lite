@@ -6,7 +6,7 @@ import { Toaster } from './components/Toaster'
 import { Home } from './pages/home/Home'
 import { HomePanel } from './pages/home/HomePanel'
 import { DocumentEditor, DocumentPanel } from './pages/DocumentEditor'
-import { HumanStudio } from './pages/HumanStudio'
+import { HumanStudio, HumanStudioPanel } from './pages/HumanStudio'
 import { Settings } from './pages/Settings'
 import { WebcamOutput, WebcamOutputPanel } from './pages/WebcamOutput'
 import { useNavStore, type Page } from './store/navStore'
@@ -25,7 +25,7 @@ type Section = { titleKey: string; center: ComponentType; right?: ComponentType 
 
 const SECTIONS: Record<Page, Section> = {
   home: { titleKey: 'nav.home', center: Home, right: HomePanel },
-  human: { titleKey: 'nav.human', center: HumanStudio },
+  human: { titleKey: 'nav.human', center: HumanStudio, right: HumanStudioPanel },
   document: { titleKey: 'nav.document', center: DocumentEditor, right: DocumentPanel },
   output: { titleKey: 'nav.output', center: WebcamOutput, right: WebcamOutputPanel },
   settings: { titleKey: 'nav.settings', center: Settings }

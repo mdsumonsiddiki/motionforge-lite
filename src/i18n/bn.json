@@ -48,6 +48,26 @@
     "backupText": "সব Document আর Character একটি ফাইলে। যেকোনো PC-তে Restore করুন।",
     "backupNow": "এখনই ব্যাকআপ নিন"
   },
+  "human": {
+    "previewChip": "প্রিভিউ · ৭২০p",
+    "noCharacter": "এখনো কোনো Character নেই",
+    "noCharacterHint": "ডান পাশের প্যানেলে একটি মুখের ছবি আপলোড করুন বা বর্ণনা দিন।",
+    "comingSoon": "শীঘ্রই আসছে (Phase 6–8)",
+    "savedChip": "সংরক্ষিত Character: {{count}}",
+    "headLimitChip": "মাথা ঘোরানোর সীমা: ±২০°",
+    "character": "ক্যারেক্টার",
+    "uploadPhoto": "ছবি আপলোড করুন",
+    "generate": "তৈরি করুন",
+    "poseExpression": "ভঙ্গি ও অভিব্যক্তি",
+    "headTurn": "মাথা ঘোরানো (বাম / ডান)",
+    "headTilt": "মাথা হেলানো (উপর / নিচ)",
+    "eyes": "চোখ (খোলা / বন্ধ)",
+    "smile": "হাসি",
+    "zoom": "জুম",
+    "textCommand": "লিখিত নির্দেশ",
+    "textCommandPlaceholder": "যেমন: হাসুন আর বামে তাকান",
+    "saveCharacter": "Character সংরক্ষণ করুন"
+  },
   "common": {
     "comingSoon": "শীঘ্রই আসছে"
   },
@@ -90,9 +110,6 @@
     "documentDesc": "Document ছবির লেখা ও ছবি সম্পাদনা",
     "output": "Webcam Output",
     "outputDesc": "OBS-এর জন্য Human বা Document আলাদা Window-তে দেখান"
-  },
-  "pages": {
-    "comingSoon": "এই অংশটি পরের একটি Phase-এ তৈরি হবে।"
   },
   "settings": {
     "title": "সেটিংস",
