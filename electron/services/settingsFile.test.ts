@@ -25,7 +25,9 @@ describe('settingsFile', () => {
       theme: 'light',
       obsPath: 'D:\\obs.exe',
       reduceEffects: true,
-      sidebarCollapsed: true
+      sidebarCollapsed: true,
+      profileName: 'সুমন',
+      profilePhoto: 'data:image/jpeg;base64,/9j/4AAQ'
     }
     saveSettings(file, saved)
     expect(existsSync(`${file}.tmp`)).toBe(false)

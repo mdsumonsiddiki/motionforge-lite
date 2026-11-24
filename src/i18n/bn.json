@@ -14,6 +14,23 @@
     "toggleSidebar": "মেনু ছোট বা বড় করুন",
     "toggleTheme": "লাইট বা ডার্ক মোড বদলান"
   },
+  "common": {
+    "comingSoon": "শীঘ্রই আসছে"
+  },
+  "profile": {
+    "menu": "প্রোফাইল মেনু",
+    "title": "প্রোফাইল",
+    "defaultName": "ক্রিয়েটর",
+    "badge": "স্টুডিও মালিক",
+    "local": "লোকাল প্রোফাইল · এই PC",
+    "displayName": "প্রদর্শিত নাম",
+    "changePhoto": "ছবি বদলান",
+    "pickPhoto": "প্রোফাইল ছবি বেছে নিন (JPG / PNG)",
+    "library": "আমার লাইব্রেরি",
+    "backup": "ব্যাকআপ",
+    "shortcuts": "শর্টকাট",
+    "done": "ঠিক আছে"
+  },
   "obs": {
     "offline": "OBS · বন্ধ",
     "running": "OBS · চলছে",
@@ -145,6 +162,7 @@
   "errors": {
     "settingsLoad": "Settings লোড করা যায়নি। Default মান ব্যবহার হচ্ছে।",
     "settingsSave": "Settings সংরক্ষণ করা যায়নি।",
+    "photoFailed": "এই ছবিটি প্রোফাইল ছবি হিসেবে ব্যবহার করা যায়নি।",
     "obsNotFound": "OBS Studio পাওয়া যায়নি। অনুগ্রহ করে obs64.exe নিজে বেছে নিন।",
     "storageLoad": "সংরক্ষিত Item লোড করা যায়নি।",
     "storageDelete": "Item মুছে ফেলা যায়নি।",

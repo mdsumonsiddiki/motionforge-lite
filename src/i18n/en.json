@@ -14,6 +14,23 @@
     "toggleSidebar": "Collapse or expand menu",
     "toggleTheme": "Switch light or dark mode"
   },
+  "common": {
+    "comingSoon": "Coming soon"
+  },
+  "profile": {
+    "menu": "Profile menu",
+    "title": "Profile",
+    "defaultName": "Creator",
+    "badge": "STUDIO OWNER",
+    "local": "Local profile · this PC",
+    "displayName": "Display name",
+    "changePhoto": "Change photo",
+    "pickPhoto": "Choose a profile photo (JPG / PNG)",
+    "library": "My Library",
+    "backup": "Backup",
+    "shortcuts": "Shortcuts",
+    "done": "Done"
+  },
   "obs": {
     "offline": "OBS · Offline",
     "running": "OBS · Running",
@@ -145,6 +162,7 @@
   "errors": {
     "settingsLoad": "Could not load settings. Defaults are used.",
     "settingsSave": "Could not save settings.",
+    "photoFailed": "Could not use this picture as the profile photo.",
     "obsNotFound": "OBS Studio was not found. Please select obs64.exe manually.",
     "storageLoad": "Could not load saved items.",
     "storageDelete": "Could not delete the item.",

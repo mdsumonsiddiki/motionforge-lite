@@ -13,6 +13,7 @@ import { useSettingsStore } from './store/settingsStore'
 import { useOutputSync } from './output/useOutputSync'
 import { Shell } from './shell/Shell'
 import { ObsPill } from './shell/ObsPill'
+import { ProfileCard } from './shell/ProfileCard'
 
 /**
  * Sections (UI_REDESIGN.md section 5): center workspace + optional right control panel.
@@ -71,6 +72,7 @@ export default function App() {
       <Shell
         title={t(section.titleKey)}
         obsPill={<ObsPill status="offline" />}
+        profile={<ProfileCard collapsed={settings?.sidebarCollapsed ?? false} />}
         center={<Center />}
         right={Right ? <Right /> : undefined}
       />

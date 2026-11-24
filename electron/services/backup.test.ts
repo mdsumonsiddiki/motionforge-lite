@@ -60,7 +60,9 @@ describe('backup / restore', () => {
     saveSettings(join(userData, 'settings.json'), {
       ...defaultSettings('x'),
       language: 'bn',
-      theme: 'light'
+      theme: 'light',
+      profileName: 'Sumon',
+      profilePhoto: 'data:image/png;base64,iVBORw0KGgo='
     })
     // A file that must NOT go into the backup (e.g. future encrypted API key).
     writeFileSync(join(userData, 'secret.bin'), 'key')
@@ -80,7 +82,12 @@ describe('backup / restore', () => {
     expect(storage.list('documents')).toEqual([{ id: doc.id, name: 'Bill' }])
     expect(storage.readFile('characters', char.id, 'poses/y5_p0.png')?.toString()).toBe('p')
     expect(storage.readFile('documents', doc.id, 'original.jpg')?.toString()).toBe('o')
-    expect(loadSettings(join(userData, 'settings.json'), 'd')).toMatchObject({ language: 'bn' })
+    expect(loadSettings(join(userData, 'settings.json'), 'd')).toMatchObject({
+      language: 'bn',
+      // The local profile (UI_REDESIGN.md 4.3) is part of the backup.
+      profileName: 'Sumon',
+      profilePhoto: 'data:image/png;base64,iVBORw0KGgo='
+    })
     expect(existsSync(join(userData, '.restore-tmp'))).toBe(false)
     // secret.bin was not in the backup, and restore leaves it alone.
     expect(readFileSync(join(userData, 'secret.bin'), 'utf8')).toBe('key')

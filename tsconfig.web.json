@@ -15,5 +15,5 @@
     "composite": true,
     "noEmit": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.json", "electron/preload.ts", "electron/shared/**/*.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.json", "electron/preload.ts", "electron/shared/**/*.ts", "package.json"]
 }

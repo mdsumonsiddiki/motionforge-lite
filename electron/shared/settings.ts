@@ -17,14 +17,32 @@ export type Settings = {
   reduceEffects: boolean
   /** Sidebar collapsed to icons only (UI_REDESIGN.md section 4.1). Default expanded. */
   sidebarCollapsed: boolean
+  /** Local profile display name (UI_REDESIGN.md 4.3), max 24 characters. '' = default name. */
+  profileName: string
+  /** Local profile photo as a small data URL (PNG / JPEG), '' = initials. */
+  profilePhoto: string
 }
+
+/** Max length of the profile display name (UI_REDESIGN.md 4.3). */
+export const PROFILE_NAME_MAX = 24
+/** Max length of the stored photo data URL (a ~128px downscaled image fits easily). */
+export const PROFILE_PHOTO_MAX = 300_000
+const PHOTO_DATA_URL = /^data:image\/(png|jpeg);base64,[A-Za-z0-9+/]+={0,2}$/
 
 export const LANGUAGES: readonly Language[] = ['en', 'bn']
 export const THEMES: readonly Theme[] = ['dark', 'light']
 
 /** Default language is English (spec section 3). */
 export function defaultSettings(obsPath: string): Settings {
-  return { language: 'en', theme: 'dark', obsPath, reduceEffects: false, sidebarCollapsed: false }
+  return {
+    language: 'en',
+    theme: 'dark',
+    obsPath,
+    reduceEffects: false,
+    sidebarCollapsed: false,
+    profileName: '',
+    profilePhoto: ''
+  }
 }
 
 /** Max length for a stored path; anything longer is treated as invalid. */
@@ -48,6 +66,19 @@ export function pickValidSettings(patch: unknown): Partial<Settings> {
   }
   if (typeof patch.reduceEffects === 'boolean') out.reduceEffects = patch.reduceEffects
   if (typeof patch.sidebarCollapsed === 'boolean') out.sidebarCollapsed = patch.sidebarCollapsed
+  if (typeof patch.profileName === 'string') {
+    // Strip control characters; keep at most 24 characters (code points, so Bangla is safe).
+    // eslint-disable-next-line no-control-regex
+    const clean = patch.profileName.replace(/[\u0000-\u001f\u007f]/g, '')
+    out.profileName = Array.from(clean).slice(0, PROFILE_NAME_MAX).join('')
+  }
+  if (
+    typeof patch.profilePhoto === 'string' &&
+    patch.profilePhoto.length <= PROFILE_PHOTO_MAX &&
+    (patch.profilePhoto === '' || PHOTO_DATA_URL.test(patch.profilePhoto))
+  ) {
+    out.profilePhoto = patch.profilePhoto
+  }
   return out
 }
 

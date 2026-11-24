@@ -50,7 +50,9 @@ function NavItem({
       }}
     >
       <Icon />
-      {showLabel && <span style={{ whiteSpace: 'nowrap' }}>{label}</span>}
+      {showLabel && (
+        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', minWidth: 0 }}>{label}</span>
+      )}
     </button>
   )
 }
@@ -76,8 +78,10 @@ export function Sidebar({ collapsed, profile }: { collapsed: boolean; profile?: 
         flexDirection: 'column',
         gap: 14,
         transition: 'flex-basis .25s',
-        overflowY: 'auto',
-        overflowX: 'hidden'
+        // No overflow clipping here: the profile popover (290px) is wider than the
+        // sidebar. Above the center so the popover covers it.
+        position: 'relative',
+        zIndex: 2
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 6px 18px', minHeight: 40 }}>
