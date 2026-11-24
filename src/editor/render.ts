@@ -53,9 +53,12 @@ export function fitFontSize(
 }
 
 /**
- * Draws the document at full resolution: original → layers in order.
- * Text layer = inpainted patch (old text removed) + new text.
- * Image layer = the user image stretched to its rect.
+ * Draws the document at full resolution:
+ *  1. the original
+ *  2. every removal patch (old text erased)
+ *  3. layers in order: new text, user images
+ * All patches go first because a patch's mask is padded beyond its box (inpaintPlan.ts);
+ * drawn in layer order, a later patch could cover part of a neighbouring line's new text.
  * A layer whose patch/image is still being prepared is skipped; the caller re-renders when
  * it arrives (and Save / Export wait for everything first).
  */
@@ -69,10 +72,15 @@ export function renderDocument(
   ctx.drawImage(original, 0, 0)
 
   for (const layer of layers) {
+    if (layer.kind !== 'text') continue
+    const patch = assets.patches.get(layer.boxId)
+    if (patch) ctx.putImageData(patch.image, patch.x, patch.y)
+  }
+
+  for (const layer of layers) {
     if (layer.kind === 'text') {
-      const patch = assets.patches.get(layer.boxId)
-      if (patch) ctx.putImageData(patch.image, patch.x, patch.y)
-      else if (!assets.failedPatches.has(layer.boxId)) continue
+      // Text waits for its patch (or for the removal to have failed).
+      if (!assets.patches.has(layer.boxId) && !assets.failedPatches.has(layer.boxId)) continue
       const lines = layer.text.split('\n')
       ctx.save()
       // Long text is drawn smaller so it stays inside the OCR box (the layer keeps its size).

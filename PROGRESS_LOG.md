@@ -76,3 +76,15 @@ Claude Code প্রতিটা Phase শেষে এখানে একট�
 - Tests: new `exif.test.ts` (II/MM, APP0 first, broken/truncated/PNG) and `fitFontSize` tests.
 - Manual test for user: open a phone photo taken in portrait (JPEG) → OCR boxes sit on the text. Type a much longer text into a box → Apply → it stays inside the box (smaller).
 - Open issues: documents saved earlier from such rotated JPEGs keep their old (wrong) OCR boxes; open the image again as a new document.
+
+## Fix — Old text not removed when editing a text box (2026-11-24)
+- Root cause: in `npm run dev`, Vite serves `inpaint.worker.ts` as a **classic** worker (`?worker_file&type=classic`, `importScripts("/@vite/env")`), but the `import type` line left `export {};` in the served code → SyntaxError in a classic worker → the worker never started → every box went silently to `failedPatches` → new text drawn over the old. The build (iife bundle) was not affected.
+- (1) `inpaint.worker.ts` now has no `import`/`export` at all (inline `import('…')` types, code in an IIFE), stays classic so `importScripts` for OpenCV works; clear error if it ever runs as a module worker; OpenCV load retried after a failure. `scripts/check-inpaint-worker.mjs` runs the dev-transformed and the built worker in a classic-worker sandbox with the real opencv.js and checks the text is removed (dev: OK, build: OK).
+- (2) A failed removal now shows an error toast (`errors.inpaintFailed`, en + bn), at most one per 5 s (`editor/inpaintFailure.ts`).
+- (3) Mask padding = ~15% of the box height (min 2 px) instead of a fixed 2 px, so matra, vowel signs and descenders are removed too.
+- (4) `editor/solidFill.ts`: if a 4 px ring around the mask is one color (≥ 90% of pixels within ±24 of the median), the mask is filled with that color on the main thread (small, cheap); otherwise OpenCV TELEA in the worker.
+- Tests: `inpaintWorker.test.ts` (no import/export; dev-mode worker really removes text), `inpaintFailure.test.ts`, `inpaintPlan.test.ts` (15% padding, matra above the box), `solidFill.test.ts` (plain / noisy / striped / gradient backgrounds).
+- Manual test for user: `npm run dev` → Document Editor → open a document → edit a box on a white page → Apply → only the new text is visible. Also try a box on a coloured/patterned area, and a Bangla line with matra. Repeat once with the installed/built app.
+- Render order (spec-reviewer finding): all removal patches are drawn first, then new text and images, so a padded patch can no longer cover a neighbouring line's new text (`renderDocument` test with a recording fake context).
+- Spec section 8: the solid-colour fill, 15% padding and error toast recorded as user decisions (2026-11-24).
+- Open issues: if the padded mask touches a neighbouring line that was NOT edited, a bit of that line's original ink could be erased; tell me with a sample image if you see it. A box whose removal failed is retried only after reopening the document.

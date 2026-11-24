@@ -121,6 +121,7 @@
     "docSaveFailed": "Could not save the document. Check that it has a name.",
     "exportFailed": "Export failed.",
     "ocrFailed": "Text recognition failed.",
+    "inpaintFailed": "The old text could not be removed. The new text is drawn on top of it.",
     "replaceTooLarge": "The picture is too large for Image Replace (max 8 MB).",
     "outputFailed": "Could not open the output window.",
     "obs_empty": "Set the OBS path in Settings first.",

@@ -1,4 +1,5 @@
 import { planInpaint } from '../editor/inpaintPlan'
+import { solidPixels, uniformRingColor } from '../editor/solidFill'
 import type { Rect } from '../editor/types'
 import type { InpaintRequest, InpaintResponse } from './inpaintProtocol'
 
@@ -11,6 +12,8 @@ const pending = new Map<number, { resolve: (b: ArrayBuffer) => void; reject: (e:
 
 function getWorker(): Worker {
   if (!worker) {
+    // Classic worker on purpose (OpenCV is loaded with importScripts) — do not add
+    // { type: 'module' }. See the comment at the top of inpaint.worker.ts.
     worker = new Worker(new URL('./inpaint.worker.ts', import.meta.url))
     worker.onmessage = (e: MessageEvent<InpaintResponse>) => {
       const job = pending.get(e.data.id)
@@ -46,6 +49,15 @@ export function inpaintBox(original: ImageData, box: Rect): Promise<Patch | null
     pixels.set(original.data.subarray(start, start + crop.w * 4), row * crop.w * 4)
   }
 
+  // Plain background around the text (e.g. a white page): cover the box with that color.
+  // Cheap (only the small ring around the box is read), so it runs here, not in the worker.
+  const solid = uniformRingColor(pixels, crop.w, crop.h, mask)
+  if (solid) {
+    const image = new ImageData(solidPixels(mask.w, mask.h, solid), mask.w, mask.h)
+    return Promise.resolve({ x: crop.x + mask.x, y: crop.y + mask.y, image })
+  }
+
+  // Patterned / textured background: OpenCV TELEA inpainting in the worker.
   const id = nextId++
   const req: InpaintRequest = {
     id,

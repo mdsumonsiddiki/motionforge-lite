@@ -9,6 +9,7 @@ import { recognize } from '../workers/ocrClient'
 import { inpaintBox } from '../workers/inpaintClient'
 import { parseEdits, serializeEdits } from './edits'
 import { readJpegOrientation } from './exif'
+import { reportInpaintFailure } from './inpaintFailure'
 import { fontCss, renderDocument, type RenderAssets } from './render'
 import { MAX_SLOTS, type Layer } from './types'
 
@@ -167,6 +168,7 @@ export function syncAssets(key: string): void {
         })
         .catch(() => {
           rt.failedPatches.add(id) // the new text is then drawn without removing the old one
+          reportInpaintFailure() // ...and the user is told, instead of failing silently
         })
         .finally(() => {
           rt.pendingPatches.delete(id)

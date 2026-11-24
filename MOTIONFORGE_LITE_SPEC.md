@@ -211,6 +211,7 @@ type CharacterState = {
 3. User একটা Box-এ Click করে Text Edit করবে।
 4. Apply চাপলে:
    - পুরোনো লেখার জায়গা `opencv.js inpaint` দিয়ে মুছে যাবে
+     - User-এর সিদ্ধান্ত (2026-11-24): Box-এর চারপাশের background এক রঙের হলে সেই রঙ দিয়ে box ঢেকে দেওয়া হবে, নকশা থাকলে TELEA inpaint। Mask padding box height-এর প্রায় ১৫% (মাত্রা ও ফলা মোছার জন্য)। মোছা ব্যর্থ হলে error toast দেখাবে।
    - নতুন লেখা Render হবে। Size, Position আর Color স্বয়ংক্রিয়ভাবে মেলানো হবে (Box height থেকে Size, আশেপাশের Dark pixel থেকে Color)
    - **Font: User Dropdown থেকে বেছে নেবে।** Bundled Font: Noto Sans Bengali, Noto Serif Bengali, Hind Siliguri, Noto Sans, Noto Serif (সবগুলো OFL License)। সঙ্গে System-এ Install থাকা Font।
 5. **Image Replace:** User একটা জায়গা (Rectangle) Select করে নতুন ছবি বসাবে। এরপর Drag আর Resize Handle দিয়ে Size ও Position ঠিক করবে।

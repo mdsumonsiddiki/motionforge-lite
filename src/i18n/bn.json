@@ -121,6 +121,7 @@
     "docSaveFailed": "Document Save করা যায়নি। নাম দেওয়া আছে কি না দেখুন।",
     "exportFailed": "Export ব্যর্থ হয়েছে।",
     "ocrFailed": "লেখা শনাক্তকরণ ব্যর্থ হয়েছে।",
+    "inpaintFailed": "পুরোনো লেখা মোছা যায়নি। নতুন লেখা তার ওপরে বসানো হয়েছে।",
     "replaceTooLarge": "ছবি বদলানোর জন্য ছবিটি খুব বড় (সর্বোচ্চ ৮ MB)।",
     "outputFailed": "Output Window খোলা যায়নি।",
     "obs_empty": "আগে Settings-এ OBS Path ঠিক করুন।",
