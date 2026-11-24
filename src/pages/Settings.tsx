@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Language, Settings as SettingsData, Theme } from '../../electron/shared/settings'
 import { ConfirmDialog } from '../components/ConfirmDialog'
+import { useDocumentStore } from '../store/documentStore'
 import { useLibraryStore } from '../store/libraryStore'
 import { useSettingsStore } from '../store/settingsStore'
 import { notify } from '../store/toastStore'
@@ -90,6 +91,11 @@ function BackupRestore() {
       if (result.status === 'done') {
         // Restored settings (theme, language) and name lists take effect right away.
         await Promise.all([reloadSettings(), refreshLibrary()])
+        // Open documents may no longer exist on disk: treat them as new, unsaved documents.
+        const docs = useDocumentStore.getState()
+        for (const s of docs.slots) {
+          if (s.docId) docs.update(s.key, { docId: null, savedLayers: null, savedName: null })
+        }
         setStatus(t('backup.restored'))
       }
     } catch {

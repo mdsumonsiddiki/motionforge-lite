@@ -7,7 +7,8 @@
   "main": "./out/main/main.js",
   "scripts": {
     "dev": "electron-vite dev",
-    "build": "npm run typecheck && electron-vite build",
+    "predev": "node scripts/copy-assets.mjs",
+    "build": "npm run typecheck && node scripts/copy-assets.mjs && electron-vite build",
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
     "lint": "eslint .",
@@ -17,12 +18,21 @@
     "feasibility:pose": "node --env-file-if-exists=.env scripts/feasibility/pose-test.mjs"
   },
   "dependencies": {
+    "@fontsource/hind-siliguri": "^5.3.0",
+    "@fontsource/noto-sans": "^5.3.0",
+    "@fontsource/noto-sans-bengali": "^5.3.0",
+    "@fontsource/noto-serif": "^5.3.0",
+    "@fontsource/noto-serif-bengali": "^5.3.0",
+    "@techstark/opencv-js": "^5.0.0-release.1",
+    "@tesseract.js-data/ben": "^1.0.0",
+    "@tesseract.js-data/eng": "^1.0.0",
     "archiver": "^8.0.0",
     "extract-zip": "^2.0.1",
     "i18next": "^27.2.6",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-i18next": "^18.0.3",
+    "tesseract.js": "^7.0.0",
     "zustand": "^5.1.0"
   },
   "devDependencies": {

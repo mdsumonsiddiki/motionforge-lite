@@ -19,6 +19,11 @@ release/
 .DS_Store
 Thumbs.db
 
+# Offline assets copied from node_modules by scripts/copy-assets.mjs
+resources/tessdata/
+resources/tesseract/
+resources/opencv/
+
 # Editor settings
 .vscode/
 

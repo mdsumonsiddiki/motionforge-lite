@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ItemKind, ItemSummary } from '../../electron/shared/storage'
+import { useDocumentStore } from '../store/documentStore'
 import { useLibraryStore } from '../store/libraryStore'
 import { ConfirmDialog } from './ConfirmDialog'
 
@@ -45,7 +46,16 @@ export function SavedList({ kind, items }: { kind: ItemKind; items: ItemSummary[
         cancelLabel={t('close.cancel')}
         onCancel={() => setPending(null)}
         onConfirm={() => {
-          if (pending) void remove(kind, pending.id)
+          if (pending) {
+            void remove(kind, pending.id)
+            // A deleted document that is still open becomes a new, unsaved document.
+            const open = useDocumentStore.getState().slots.find((s) => s.docId === pending.id)
+            if (kind === 'documents' && open) {
+              useDocumentStore
+                .getState()
+                .update(open.key, { docId: null, savedLayers: null, savedName: null })
+            }
+          }
           setPending(null)
         }}
       />

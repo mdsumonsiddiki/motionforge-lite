@@ -1,8 +1,42 @@
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, net, protocol, session, shell } from 'electron'
 import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { IPC } from './shared/ipc'
 import { registerSettingsIpc } from './ipc/settings'
 import { registerStorageIpc } from './ipc/storage'
+import { registerDocumentIpc } from './ipc/document'
+import { APP_HOST, APP_INDEX_URL, APP_SCHEME, resolveAppFile } from './services/appProtocol'
+
+// Must run before `app.whenReady()`: the built renderer is served from app://bundle/.
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: APP_SCHEME,
+    privileges: { standard: true, secure: true, supportFetchAPI: true }
+  }
+])
+
+/** Serves files of the built renderer (out/renderer) under app://bundle/. */
+function registerAppProtocol(): void {
+  const rendererDir = join(__dirname, '../renderer')
+  protocol.handle(APP_SCHEME, (request) => {
+    const url = new URL(request.url)
+    const file = url.host === APP_HOST ? resolveAppFile(rendererDir, url.pathname) : null
+    if (!file) return new Response('Not found', { status: 404 })
+    return net.fetch(pathToFileURL(file).toString())
+  })
+}
+
+/**
+ * Only the Local Font Access permission is granted (Document Editor lists the
+ * fonts installed on Windows). Everything else (camera, mic, ...) is denied.
+ */
+function restrictPermissions(): void {
+  const allowed = new Set(['local-fonts'])
+  session.defaultSession.setPermissionRequestHandler((_wc, permission, callback) =>
+    callback(allowed.has(permission))
+  )
+  session.defaultSession.setPermissionCheckHandler((_wc, permission) => allowed.has(permission))
+}
 
 /**
  * Creates the main application window.
@@ -38,10 +72,16 @@ function createMainWindow(): BrowserWindow {
 
   // electron-vite sets ELECTRON_RENDERER_URL in dev mode.
   const devUrl = process.env['ELECTRON_RENDERER_URL']
+
+  // The window may only show the app itself (dev server in dev, app://bundle/ when built).
+  const appOrigin = !app.isPackaged && devUrl ? new URL(devUrl).origin : `${APP_SCHEME}://${APP_HOST}`
+  win.webContents.on('will-navigate', (event, url) => {
+    if (new URL(url).origin !== appOrigin) event.preventDefault()
+  })
   if (!app.isPackaged && devUrl) {
     void win.loadURL(devUrl)
   } else {
-    void win.loadFile(join(__dirname, '../renderer/index.html'))
+    void win.loadURL(APP_INDEX_URL)
   }
 
   return win
@@ -75,8 +115,11 @@ function setupCloseConfirmation(win: BrowserWindow): void {
 }
 
 app.whenReady().then(() => {
+  registerAppProtocol()
+  restrictPermissions()
   registerSettingsIpc()
   registerStorageIpc()
+  registerDocumentIpc()
   createMainWindow()
 
   app.on('activate', () => {

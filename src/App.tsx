@@ -1,7 +1,9 @@
 import { useEffect, type ComponentType } from 'react'
+import { useTranslation } from 'react-i18next'
 import i18n from './i18n'
 import { AppHeader } from './components/AppHeader'
 import { CloseConfirmDialog } from './components/CloseConfirmDialog'
+import { ConfirmDialog } from './components/ConfirmDialog'
 import { Toaster } from './components/Toaster'
 import { Dashboard } from './pages/Dashboard'
 import { DocumentEditor } from './pages/DocumentEditor'
@@ -21,6 +23,7 @@ const PAGES: Record<Page, ComponentType> = {
 
 /** App shell: header + current page + toasts + close confirmation. */
 export default function App() {
+  const { t } = useTranslation()
   const page = useNavStore((s) => s.page)
   const settings = useSettingsStore((s) => s.settings)
   const load = useSettingsStore((s) => s.load)
@@ -42,6 +45,9 @@ export default function App() {
   }, [language])
 
   const CurrentPage = PAGES[page]
+  const pendingPage = useNavStore((s) => s.pendingPage)
+  const confirmLeave = useNavStore((s) => s.confirmLeave)
+  const cancelLeave = useNavStore((s) => s.cancelLeave)
 
   return (
     <div className="flex h-full flex-col bg-white text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100">
@@ -51,6 +57,16 @@ export default function App() {
       </main>
       <Toaster />
       <CloseConfirmDialog />
+      {/* Unsaved changes warning when leaving a page (spec section 5). */}
+      <ConfirmDialog
+        open={pendingPage !== null}
+        title={t('doc.unsavedTitle')}
+        message={t('doc.leaveUnsavedMessage')}
+        confirmLabel={t('doc.leaveAnyway')}
+        cancelLabel={t('close.cancel')}
+        onConfirm={confirmLeave}
+        onCancel={cancelLeave}
+      />
     </div>
   )
 }

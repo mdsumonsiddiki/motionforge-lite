@@ -21,9 +21,12 @@ function cspPlugin(): Plugin {
       const connect = isDev ? "connect-src 'self' ws://localhost:*" : "connect-src 'self'"
       const content = [
         "default-src 'self'",
-        script,
+        // 'wasm-unsafe-eval': OCR (tesseract) and inpaint (OpenCV) run WebAssembly.
+        `${script} 'wasm-unsafe-eval'`,
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: blob:",
+        "font-src 'self' data:",
+        "worker-src 'self' blob:",
         connect
       ].join('; ')
       return [
@@ -56,6 +59,8 @@ export default defineConfig({
   },
   renderer: {
     root: resolve(__dirname, 'src'),
+    // Offline OCR / inpaint assets (filled by scripts/copy-assets.mjs), served as-is.
+    publicDir: resolve(__dirname, 'resources'),
     build: {
       rollupOptions: {
         input: resolve(__dirname, 'src/index.html')
