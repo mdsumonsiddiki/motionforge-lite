@@ -156,3 +156,11 @@ Claude Code প্রতিটা Phase শেষে এখানে একট�
 - `BlobImage` shows image bytes via a blob URL that is revoked on change / unmount. `openErrors.ts`: open-error mapping shared by the editor and Home (moved, unchanged).
 - Tests: `pages/home/homeModel.test.ts` (continue target, getting-started steps). typecheck ✅ lint ✅ test ✅ (195) build ✅.
 - Manual test for user: start with no documents → "Open your first document" → pick a JPG → editor opens; back to Home → card shows the document + thumbnail + Slot 1; Send to Output → Webcam Output shows it; Back up now → choose folder → status shows the zip path.
+
+## UI Redesign — Step 5: Document Editor re-skin (2026-11-25, branch `ui-redesign`)
+- Center: slot tabs (46px, radius 14; active tab sunken + accent text; dirty dot; ✕ close with the existing unsaved confirmation), one "+ Open document" tab per free slot (popover with the existing Open image / Open saved controls), "n / 3 open · All changes saved / Unsaved changes"; sunken canvas area (radius 26, min 480px) with the existing preview. Empty state: "No document open".
+- Right panel (`DocumentPanel` → `DocControls`), in the spec order: Edit Text (OCR progress / "n lines found · m uncertain (yellow)" / error + Try again / handwriting warning, Detected line, textarea, Font, hint, Apply 48px), Replace Image (Select area, Remove selected image), Undo · Redo · Export (Export shows PNG / JPG), then Document (name, Save, Delete).
+- No editor logic changed: same session / store calls; only markup, styles and the shared `selectingArea` flag (moved to `docUiStore` because preview and controls are now in different slots). Overlay colours follow the reference (selected #8b5cf6, boxes #38bdf8, uncertain dashed #eab308); canvas shadow from the reference.
+- New tokens `--warn` / `--danger-text` (warning / error text), checked ≥ 4.5:1 on every surface in both themes.
+- Tests: all existing editor tests unchanged and passing. typecheck ✅ lint ✅ test ✅ (195) build ✅.
+- Manual test for user: open 1 document → tabs show it + two "+ Open document"; click a text box → right panel shows Detected / textarea / Font / Apply; Apply works as before; Select area → drag → pick image; Undo / Redo; Export → PNG; Save; Delete.

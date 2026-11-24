@@ -3,10 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { useLibraryStore } from '../../store/libraryStore'
 import { notify } from '../../store/toastStore'
 import { openImage, openSaved } from '../../editor/session'
+import { Btn, Muted } from '../../shell/ui'
+import { fieldStyle } from '../../shell/styles'
 import { handleOpenResult as handleResult, openErrorKey } from './openErrors'
 
-/** "Open image" and "Open saved document" controls. */
-export function OpenControls() {
+/** "Open image" and "Open saved document" controls. `onOpened` runs after a successful open. */
+export function OpenControls({ onOpened }: { onOpened?: () => void }) {
   const { t } = useTranslation()
   const documents = useLibraryStore((s) => s.documents)
   const refresh = useLibraryStore((s) => s.refresh)
@@ -17,10 +19,10 @@ export function OpenControls() {
     void refresh()
   }, [refresh])
 
-  const run = async (fn: () => Promise<void>): Promise<void> => {
+  const run = async (fn: () => Promise<boolean>): Promise<void> => {
     setBusy(true)
     try {
-      await fn()
+      if (await fn()) onOpened?.()
     } catch (err) {
       notify.error(openErrorKey(err))
     } finally {
@@ -31,33 +33,34 @@ export function OpenControls() {
   const pick = () =>
     run(async () => {
       const picked = await window.api.document.pickImage(t('doc.pickImageTitle'))
-      if (picked) handleResult(await openImage(picked))
+      if (!picked) return false
+      const result = await openImage(picked)
+      handleResult(result)
+      return result.status !== 'full'
     })
 
   const openStored = () =>
     run(async () => {
-      if (!selected) return
-      handleResult(await openSaved(await window.api.document.load(selected)))
+      if (!selected) return false
+      const result = await openSaved(await window.api.document.load(selected))
+      handleResult(result)
+      return result.status !== 'full'
     })
 
   return (
-    <div className="space-y-2">
-      <button
-        type="button"
-        disabled={busy}
-        onClick={() => void pick()}
-        className="w-full rounded-md bg-indigo-600 px-3 py-2 text-sm text-white hover:bg-indigo-700 disabled:opacity-50"
-      >
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <Btn tone="accent" disabled={busy} onClick={() => void pick()}>
         {t('doc.openImage')}
-      </button>
-      <p className="text-xs text-neutral-500 dark:text-neutral-400">{t('doc.openImageHint')}</p>
+      </Btn>
+      <Muted>{t('doc.openImageHint')}</Muted>
       {documents.length > 0 && (
-        <div className="flex gap-2">
+        <div style={{ display: 'flex', gap: 10 }}>
           <select
+            className="as-in as-sink"
             value={selected}
             onChange={(e) => setSelected(e.target.value)}
             aria-label={t('doc.savedDocuments')}
-            className="min-w-0 flex-1 rounded-md border border-neutral-300 bg-transparent px-2 py-1.5 text-sm dark:bg-neutral-900"
+            style={{ ...fieldStyle, flex: 1, minWidth: 0, padding: '0 12px' }}
           >
             <option value="">{t('doc.chooseSaved')}</option>
             {documents.map((d) => (
@@ -66,14 +69,9 @@ export function OpenControls() {
               </option>
             ))}
           </select>
-          <button
-            type="button"
-            disabled={busy || !selected}
-            onClick={() => void openStored()}
-            className="rounded-md border border-neutral-300 px-3 text-sm hover:bg-neutral-100 disabled:opacity-50 dark:border-neutral-700 dark:hover:bg-neutral-800"
-          >
+          <Btn disabled={busy || !selected} onClick={() => void openStored()} style={{ padding: '0 16px' }}>
             {t('doc.open')}
-          </button>
+          </Btn>
         </div>
       )}
     </div>

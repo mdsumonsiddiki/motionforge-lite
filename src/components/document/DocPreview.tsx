@@ -171,7 +171,7 @@ export function DocPreview({
           top: Math.max(0, (avail.h - slot.height * scale) / 2)
         }}
       >
-        <canvas ref={canvasRef} className="block h-full w-full shadow-lg" />
+        <canvas ref={canvasRef} className="block h-full w-full" style={{ boxShadow: '0 24px 44px rgba(0,0,0,0.4)' }} />
         <div
           data-overlay
           className={`absolute inset-0 ${selectingArea ? 'cursor-crosshair' : ''}`}
@@ -185,7 +185,7 @@ export function DocPreview({
             slotBoxes(slot).map((box) => {
               const uncertain = isUncertain(box)
               const label = uncertain && (
-                <span className="pointer-events-none absolute -top-4 left-0 rounded-sm bg-amber-400 px-1 text-[10px] leading-4 whitespace-nowrap text-black">
+                <span className="pointer-events-none absolute -top-4 left-0 rounded-sm bg-yellow-500 px-1 text-[10px] leading-4 whitespace-nowrap text-black">
                   {t('doc.uncertain')}
                 </span>
               )
@@ -202,7 +202,9 @@ export function DocPreview({
                     onPointerMove={onMove}
                     onPointerUp={onUp}
                     className={`absolute cursor-move border-2 ${
-                      uncertain ? 'border-amber-400 bg-amber-400/10' : 'border-indigo-500 bg-indigo-500/10'
+                      uncertain
+                        ? 'border-dashed border-yellow-500 bg-yellow-500/10'
+                        : 'border-violet-500 bg-violet-500/10'
                     }`}
                     style={px(rect)}
                   >
@@ -213,7 +215,7 @@ export function DocPreview({
                         onPointerDown={(e) => startBoxDrag(e, box, h)}
                         onPointerMove={onMove}
                         onPointerUp={onUp}
-                        className={`absolute h-3 w-3 rounded-sm border border-white bg-indigo-600 ${HANDLE_POS[h]}`}
+                        className={`absolute h-3 w-3 rounded-sm border border-white bg-violet-600 ${HANDLE_POS[h]}`}
                       />
                     ))}
                   </div>
@@ -228,8 +230,8 @@ export function DocPreview({
                   onClick={() => update(slot.key, { selectedBoxId: box.id, selectedLayerId: null })}
                   className={`absolute border ${
                     uncertain
-                      ? 'border-amber-400 hover:bg-amber-400/10'
-                      : 'border-sky-500/70 hover:bg-sky-500/10'
+                      ? 'border-2 border-dashed border-yellow-500 hover:bg-yellow-500/10'
+                      : 'border-sky-400 hover:bg-sky-400/10'
                   }`}
                   style={px(box.rect)}
                 >
@@ -250,7 +252,7 @@ export function DocPreview({
                 onPointerMove={onMove}
                 onPointerUp={onUp}
                 className={`absolute ${selectingArea ? 'pointer-events-none' : 'cursor-move'} ${
-                  slot.selectedLayerId === layer.id ? 'outline-2 outline-indigo-500' : ''
+                  slot.selectedLayerId === layer.id ? 'outline-2 outline-violet-500' : ''
                 }`}
                 style={px(layer.rect)}
               >
@@ -261,7 +263,7 @@ export function DocPreview({
                       onPointerDown={(e) => startLayerDrag(e, layer, h)}
                       onPointerMove={onMove}
                       onPointerUp={onUp}
-                      className={`absolute h-3 w-3 rounded-sm border border-white bg-indigo-600 ${HANDLE_POS[h]}`}
+                      className={`absolute h-3 w-3 rounded-sm border border-white bg-violet-600 ${HANDLE_POS[h]}`}
                     />
                   ))}
               </div>
@@ -270,7 +272,7 @@ export function DocPreview({
 
           {draftArea && (
             <div
-              className="pointer-events-none absolute border-2 border-dashed border-amber-500 bg-amber-400/10"
+              className="pointer-events-none absolute border-2 border-dashed border-yellow-500 bg-yellow-500/10"
               style={px(draftArea)}
             />
           )}

@@ -45,6 +45,9 @@
   --nav-fg-on: #5eead4;
   /* OBS pill text when LIVE. */
   --live-fg: #86efac;
+  /* Warning / error text in panels (not in the reference; chosen for ≥ 4.5:1). */
+  --warn: #fcd34d;
+  --danger-text: #f87171;
 }
 
 [data-theme='light'] {
@@ -92,6 +95,8 @@
   --nav-fg: #5f5980;
   --nav-fg-on: #ffffff;
   --live-fg: #15803d;
+  --warn: #92400e;
+  --danger-text: #b91c1c;
 }
 
 /* Fixed colours (section 2). */

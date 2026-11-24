@@ -1,7 +1,8 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ExportFormat } from '../../../electron/shared/document'
 import { slotBoxes, slotLayers, useDocumentStore, type Slot } from '../../store/documentStore'
+import { useDocUiStore } from '../../store/docUiStore'
 import { useLibraryStore } from '../../store/libraryStore'
 import { notify } from '../../store/toastStore'
 import { canRedo, canUndo } from '../../editor/history'
@@ -18,21 +19,19 @@ import {
   saveSlot,
   syncAssets
 } from '../../editor/session'
+import { Btn, Muted, PanelTitle } from '../../shell/ui'
+import { fieldStyle } from '../../shell/styles'
 import { ConfirmDialog } from '../ConfirmDialog'
-import { OpenControls } from './OpenControls'
 
-const btn =
-  'rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 disabled:opacity-50 dark:border-neutral-700 dark:hover:bg-neutral-800'
+/** Warning text (uncertain OCR): amber that passes 4.5:1 in both themes. */
+const WARN = { color: 'var(--warn)' } as const
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="space-y-2 border-b border-neutral-200 pb-4 dark:border-neutral-800">
-      <h2 className="text-xs font-semibold tracking-wide text-neutral-500 uppercase dark:text-neutral-400">
-        {title}
-      </h2>
-      {children}
-    </section>
-  )
+const labelStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 6,
+  fontSize: 12,
+  color: 'var(--muted)'
 }
 
 /** Text edit form for one OCR box: new text + font, then Apply. */
@@ -75,28 +74,35 @@ function TextEditor({
   }
 
   return (
-    <div className="space-y-2">
-      <p className="text-xs text-neutral-500">
-        {t('doc.ocrText')}: <span className="text-neutral-700 dark:text-neutral-300">{box.text}</span>
-      </p>
-      {isUncertain(box) && (
-        <p className="text-xs text-amber-700 dark:text-amber-300">{t('doc.uncertainHint')}</p>
-      )}
-      <p className="text-xs text-neutral-500">{t('doc.adjustBoxHint')}</p>
-      <textarea
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        rows={3}
-        aria-label={t('doc.newText')}
-        className="w-full rounded-md border border-neutral-300 bg-transparent px-2 py-1.5 text-sm"
-        style={{ fontFamily: `"${font}"` }}
-      />
-      <label className="block text-sm">
-        <span className="mb-1 block text-xs text-neutral-500">{t('doc.font')}</span>
+    <>
+      {isUncertain(box) && <Muted style={WARN}>{t('doc.uncertainHint')}</Muted>}
+      <Muted>{t('doc.adjustBoxHint')}</Muted>
+      <label style={labelStyle}>
+        <span style={{ overflowWrap: 'anywhere' }}>
+          {t('doc.ocrText')}: <span style={{ color: 'var(--text)' }}>{box.text}</span>
+        </span>
+        <textarea
+          className="as-in as-sink"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          rows={3}
+          aria-label={t('doc.newText')}
+          style={{
+            ...fieldStyle,
+            minHeight: undefined,
+            padding: '12px 14px',
+            resize: 'vertical',
+            fontFamily: `"${font}"`
+          }}
+        />
+      </label>
+      <label style={labelStyle}>
+        {t('doc.font')}
         <select
+          className="as-in as-sink"
           value={font}
           onChange={(e) => onFontChange(e.target.value)}
-          className="w-full rounded-md border border-neutral-300 bg-transparent px-2 py-1.5 dark:bg-neutral-900"
+          style={{ ...fieldStyle, padding: '0 12px' }}
         >
           {fonts.map((f) => (
             <option key={f} value={f}>
@@ -105,41 +111,82 @@ function TextEditor({
           ))}
         </select>
       </label>
-      <p className="text-xs text-neutral-500">{t('doc.autoStyle')}</p>
-      <button
-        type="button"
+      <Muted>{t('doc.autoStyle')}</Muted>
+      <Btn
+        tone="accent"
         disabled={!draft.trim() || applying}
         onClick={() => void apply()}
-        className="w-full rounded-md bg-indigo-600 px-3 py-2 text-sm text-white hover:bg-indigo-700 disabled:opacity-50"
+        style={{ minHeight: 48, fontSize: 14 }}
       >
         {t('doc.apply')}
-      </button>
-      {inpainting && <p className="text-xs text-neutral-500">{t('doc.removingOld')}</p>}
-    </div>
+      </Btn>
+      {inpainting && <Muted>{t('doc.removingOld')}</Muted>}
+    </>
   )
 }
 
-/** Left side of the Document Editor (spec section 6: controls left, preview right). */
-export function DocControls({
-  slot,
-  selectingArea,
-  onToggleSelectArea
-}: {
-  slot: Slot
-  selectingArea: boolean
-  onToggleSelectArea: () => void
-}) {
+/** OCR status line(s): progress, "n lines found · m uncertain", error + retry. */
+function OcrStatus({ slot }: { slot: Slot }) {
+  const { t } = useTranslation()
+  if (slot.ocrStatus === 'running') {
+    const percent = Math.round(slot.ocrProgress * 100)
+    return (
+      <>
+        <Muted>{t('doc.ocrRunning', { percent })}</Muted>
+        <div
+          className="as-sink"
+          role="progressbar"
+          aria-label={t('doc.ocr')}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={percent}
+          style={{ height: 10, borderRadius: 999, background: 'var(--inset)', overflow: 'hidden' }}
+        >
+          <div style={{ height: '100%', width: `${percent}%`, background: 'var(--accent)', borderRadius: 999 }} />
+        </div>
+      </>
+    )
+  }
+  if (slot.ocrStatus === 'error') {
+    return (
+      <>
+        <Muted style={{ color: 'var(--danger-text)' }}>{t('errors.ocrFailed')}</Muted>
+        <Btn onClick={() => void runOcr(slot.key)}>{t('doc.retry')}</Btn>
+      </>
+    )
+  }
+  const uncertain = slot.ocr.filter(isUncertain).length
+  return (
+    <>
+      <Muted>{t('doc.linesFound', { count: slot.ocr.length, uncertain })}</Muted>
+      {looksUnreliable(slot.ocr) && (
+        <Muted style={WARN}>
+          <span role="status">{t('doc.unreliableOcr')}</span>
+        </Muted>
+      )}
+    </>
+  )
+}
+
+/**
+ * Document Editor right panel (UI_REDESIGN.md section 5): Edit Text, Replace Image,
+ * Undo · Redo · Export, then the document's name / Save / Delete. Logic unchanged.
+ */
+export function DocControls({ slot }: { slot: Slot }) {
   const { t } = useTranslation()
   const update = useDocumentStore((s) => s.update)
   const commitLayers = useDocumentStore((s) => s.commitLayers)
   const undo = useDocumentStore((s) => s.undo)
   const redo = useDocumentStore((s) => s.redo)
   const refreshLibrary = useLibraryStore((s) => s.refresh)
+  const selectingArea = useDocUiStore((s) => s.selectingArea)
+  const toggleSelectingArea = useDocUiStore((s) => s.toggleSelectingArea)
 
   const [fonts, setFonts] = useState<string[]>([...BUNDLED_FONTS])
   const [font, setFont] = useState<string>(BUNDLED_FONTS[0] ?? 'Noto Sans Bengali')
   const [busy, setBusy] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [exportOpen, setExportOpen] = useState(false)
   const [status, setStatus] = useState<string | null>(null)
 
   useEffect(() => {
@@ -170,11 +217,13 @@ export function DocControls({
       setStatus(t('doc.saved'))
     }, 'errors.docSaveFailed')
 
-  const doExport = (format: ExportFormat) =>
-    withBusy(async () => {
+  const doExport = (format: ExportFormat) => {
+    setExportOpen(false)
+    return withBusy(async () => {
       const file = await exportSlot(slot.key, format)
       if (file) setStatus(t('doc.exported', { file }))
     }, 'errors.exportFailed')
+  }
 
   const remove = () =>
     withBusy(async () => {
@@ -186,142 +235,101 @@ export function DocControls({
   const inpainting = isInpainting(slot.key)
 
   return (
-    <div className="space-y-4 p-4">
-      <Section title={t('doc.file')}>
-        <OpenControls />
-        <label className="block text-sm">
-          <span className="mb-1 block text-xs text-neutral-500">{t('doc.name')}</span>
-          <input
-            type="text"
-            value={slot.name}
-            maxLength={100}
-            onChange={(e) => update(slot.key, { name: e.target.value })}
-            className="w-full rounded-md border border-neutral-300 bg-transparent px-2 py-1.5"
-          />
-        </label>
-        <div className="flex flex-wrap gap-2">
-          <button type="button" disabled={busy} onClick={() => void save()} className={btn}>
-            {t('doc.save')}
-          </button>
-          <button type="button" disabled={busy} onClick={() => void doExport('png')} className={btn}>
-            {t('doc.exportPng')}
-          </button>
-          <button type="button" disabled={busy} onClick={() => void doExport('jpg')} className={btn}>
-            {t('doc.exportJpg')}
-          </button>
-          {slot.docId && (
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => setConfirmDelete(true)}
-              className={`${btn} text-red-600 dark:text-red-400`}
-            >
-              {t('library.delete')}
-            </button>
-          )}
-        </div>
-        {status && (
-          <p role="status" className="text-xs break-all text-emerald-600 dark:text-emerald-400">
-            {status}
-          </p>
-        )}
-      </Section>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <PanelTitle>{t('doc.editText')}</PanelTitle>
+      <OcrStatus slot={slot} />
+      {box ? (
+        <TextEditor
+          // Re-mount per box, so the text field starts with that box's current text.
+          key={`${slot.key}:${box.id}`}
+          slot={slot}
+          box={box}
+          fonts={fonts}
+          font={font}
+          onFontChange={setFont}
+          inpainting={inpainting}
+        />
+      ) : (
+        slot.ocrStatus === 'done' && <Muted>{t('doc.selectBoxHint')}</Muted>
+      )}
 
-      <Section title={t('doc.ocr')}>
-        {slot.ocrStatus === 'running' && (
-          <div>
-            <div className="mb-1 text-xs text-neutral-500">
-              {t('doc.ocrRunning', { percent: Math.round(slot.ocrProgress * 100) })}
-            </div>
-            <div className="h-1.5 rounded bg-neutral-200 dark:bg-neutral-800">
-              <div
-                className="h-1.5 rounded bg-indigo-500 transition-all"
-                style={{ width: `${Math.round(slot.ocrProgress * 100)}%` }}
-              />
-            </div>
-          </div>
-        )}
-        {slot.ocrStatus === 'done' && (
-          <p className="text-xs text-neutral-500">{t('doc.ocrDone', { count: slot.ocr.length })}</p>
-        )}
-        {slot.ocrStatus === 'done' && looksUnreliable(slot.ocr) && (
-          <p role="status" className="text-xs text-amber-700 dark:text-amber-300">
-            {t('doc.unreliableOcr')}
-          </p>
-        )}
-        {slot.ocrStatus === 'error' && (
-          <div className="space-y-2">
-            <p className="text-xs text-red-600 dark:text-red-400">{t('errors.ocrFailed')}</p>
-            <button type="button" onClick={() => void runOcr(slot.key)} className={btn}>
-              {t('doc.retry')}
-            </button>
-          </div>
-        )}
-      </Section>
-
-      <Section title={t('doc.editText')}>
-        {box ? (
-          <TextEditor
-            // Re-mount per box, so the text field starts with that box's current text.
-            key={`${slot.key}:${box.id}`}
-            slot={slot}
-            box={box}
-            fonts={fonts}
-            font={font}
-            onFontChange={setFont}
-            inpainting={inpainting}
-          />
-        ) : (
-          <p className="text-xs text-neutral-500">{t('doc.selectBoxHint')}</p>
-        )}
-      </Section>
-
-      <Section title={t('doc.imageReplace')}>
-        <button
-          type="button"
-          onClick={onToggleSelectArea}
-          aria-pressed={selectingArea}
-          className={`${btn} w-full ${selectingArea ? 'border-amber-500 bg-amber-50 dark:bg-amber-950' : ''}`}
+      <PanelTitle sub>{t('doc.imageReplace')}</PanelTitle>
+      <Btn
+        on={selectingArea}
+        aria-pressed={selectingArea}
+        onClick={toggleSelectingArea}
+        style={selectingArea ? { color: 'var(--accent-text)', fontWeight: 600 } : undefined}
+      >
+        {selectingArea ? t('doc.cancelSelect') : t('doc.selectArea')}
+      </Btn>
+      <Muted>{t('doc.imageReplaceHint')}</Muted>
+      {selectedImage && (
+        <Btn
+          onClick={() => {
+            commitLayers(slot.key, removeLayer(layers, selectedImage.id))
+            update(slot.key, { selectedLayerId: null })
+          }}
+          style={{ color: 'var(--danger-text)' }}
         >
-          {selectingArea ? t('doc.cancelSelect') : t('doc.selectArea')}
-        </button>
-        <p className="text-xs text-neutral-500">{t('doc.imageReplaceHint')}</p>
-        {selectedImage && (
-          <button
-            type="button"
-            onClick={() => {
-              commitLayers(slot.key, removeLayer(layers, selectedImage.id))
-              update(slot.key, { selectedLayerId: null })
-            }}
-            className={`${btn} w-full text-red-600 dark:text-red-400`}
-          >
-            {t('doc.removeImage')}
-          </button>
-        )}
-      </Section>
+          {t('doc.removeImage')}
+        </Btn>
+      )}
 
-      <Section title={t('doc.history')}>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            disabled={!canUndo(slot.history)}
-            onClick={() => undo(slot.key)}
-            title="Ctrl+Z"
-            className={btn}
-          >
-            {t('doc.undo')}
-          </button>
-          <button
-            type="button"
-            disabled={!canRedo(slot.history)}
-            onClick={() => redo(slot.key)}
-            title="Ctrl+Y"
-            className={btn}
-          >
-            {t('doc.redo')}
-          </button>
+      <div style={{ display: 'flex', gap: 12 }}>
+        <Btn disabled={!canUndo(slot.history)} onClick={() => undo(slot.key)} title="Ctrl+Z" style={{ flex: 1 }}>
+          {t('doc.undo')}
+        </Btn>
+        <Btn disabled={!canRedo(slot.history)} onClick={() => redo(slot.key)} title="Ctrl+Y" style={{ flex: 1 }}>
+          {t('doc.redo')}
+        </Btn>
+        <Btn
+          on={exportOpen}
+          disabled={busy}
+          aria-expanded={exportOpen}
+          onClick={() => setExportOpen(!exportOpen)}
+          style={{ flex: 1 }}
+        >
+          {t('doc.export')}
+        </Btn>
+      </div>
+      {exportOpen && (
+        <div style={{ display: 'flex', gap: 12 }}>
+          <Btn tone="solid" onClick={() => void doExport('png')} style={{ flex: 1 }}>
+            {t('doc.exportPng')}
+          </Btn>
+          <Btn tone="solid" onClick={() => void doExport('jpg')} style={{ flex: 1 }}>
+            {t('doc.exportJpg')}
+          </Btn>
         </div>
-      </Section>
+      )}
+
+      <PanelTitle sub>{t('doc.file')}</PanelTitle>
+      <label style={labelStyle}>
+        {t('doc.name')}
+        <input
+          className="as-in as-sink"
+          type="text"
+          value={slot.name}
+          maxLength={100}
+          onChange={(e) => update(slot.key, { name: e.target.value })}
+          style={fieldStyle}
+        />
+      </label>
+      <div style={{ display: 'flex', gap: 12 }}>
+        <Btn tone="accent" disabled={busy} onClick={() => void save()} style={{ flex: 1 }}>
+          {t('doc.save')}
+        </Btn>
+        {slot.docId && (
+          <Btn disabled={busy} onClick={() => setConfirmDelete(true)} style={{ flex: 1, color: 'var(--danger-text)' }}>
+            {t('library.delete')}
+          </Btn>
+        )}
+      </div>
+      {status && (
+        <p role="status" style={{ margin: 0, fontSize: 12, color: 'var(--muted)', overflowWrap: 'anywhere' }}>
+          {status}
+        </p>
+      )}
 
       <ConfirmDialog
         open={confirmDelete}

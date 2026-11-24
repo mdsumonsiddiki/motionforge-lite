@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { DocControls } from '../components/document/DocControls'
 import { DocPreview } from '../components/document/DocPreview'
@@ -8,7 +8,9 @@ import { addImageLayer } from '../editor/edits'
 import { syncAssets } from '../editor/session'
 import type { Rect } from '../editor/types'
 import { slotLayers, useActiveSlot, useDocumentStore } from '../store/documentStore'
+import { useDocUiStore } from '../store/docUiStore'
 import { notify } from '../store/toastStore'
+import { Muted, PanelTitle } from '../shell/ui'
 
 /** Max size of a replacement picture (it is embedded in edits.json as base64). */
 const MAX_REPLACE_IMAGE_BYTES = 8 * 1024 * 1024
@@ -25,12 +27,15 @@ function toDataUrl(data: Uint8Array, type: 'png' | 'jpg'): Promise<string> {
   })
 }
 
-/** Document Editor (spec section 8): up to 3 slots, OCR, text edit, image replace, undo/redo. */
+/**
+ * Document Editor center (spec section 8, UI_REDESIGN.md section 5): slot tabs and the
+ * sunken canvas area with the existing editor preview. Controls are in DocumentPanel.
+ */
 export function DocumentEditor() {
   const { t } = useTranslation()
   const slot = useActiveSlot()
-  const hasSlots = useDocumentStore((s) => s.slots.length > 0)
-  const [selectingArea, setSelectingArea] = useState(false)
+  const selectingArea = useDocUiStore((s) => s.selectingArea)
+  const setSelectingArea = useDocUiStore((s) => s.setSelectingArea)
 
   // Ctrl+Z / Ctrl+Y (also Ctrl+Shift+Z). Text fields keep their own undo.
   useEffect(() => {
@@ -58,6 +63,9 @@ export function DocumentEditor() {
     if (slot) syncAssets(slot.key)
   }, [slot?.key, slot?.history.present]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Leaving the editor ends an area selection.
+  useEffect(() => () => setSelectingArea(false), [setSelectingArea])
+
   /** Image Replace: after an area is selected, the user picks the new image. */
   const onAreaSelected = async (rect: Rect): Promise<void> => {
     setSelectingArea(false)
@@ -84,33 +92,58 @@ export function DocumentEditor() {
   }
 
   return (
-    <div className="flex h-full flex-col">
-      {hasSlots && <SlotTabs />}
-      {slot ? (
-        <div className="flex min-h-0 flex-1">
-          <aside className="w-80 shrink-0 overflow-y-auto border-r border-neutral-200 dark:border-neutral-800">
-            <DocControls
-              slot={slot}
-              selectingArea={selectingArea}
-              onToggleSelectArea={() => setSelectingArea((v) => !v)}
-            />
-          </aside>
-          <section className="min-w-0 flex-1 bg-neutral-100 p-4 dark:bg-neutral-950">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18, flex: 1, minHeight: 0 }}>
+      <SlotTabs />
+      <div
+        className="as-sink"
+        style={{
+          position: 'relative',
+          flex: 1,
+          minHeight: 480,
+          borderRadius: 26,
+          background: 'var(--inset)'
+        }}
+      >
+        {slot ? (
+          <div style={{ position: 'absolute', inset: 24 }}>
             <DocPreview
               slot={slot}
               selectingArea={selectingArea}
               onAreaSelected={(rect) => void onAreaSelected(rect)}
             />
-          </section>
-        </div>
-      ) : (
-        <div className="flex flex-1 items-center justify-center p-8">
-          <div className="w-80 space-y-4">
-            <h1 className="text-xl font-semibold">{t('dashboard.document')}</h1>
-            <OpenControls />
           </div>
-        </div>
-      )}
+        ) : (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              padding: 24,
+              textAlign: 'center'
+            }}
+          >
+            <span style={{ fontSize: 18, fontWeight: 600 }}>{t('doc.noDocument')}</span>
+            <Muted style={{ fontSize: 13 }}>{t('doc.noDocumentHint')}</Muted>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/** Document Editor right panel: the editor controls, or the open controls when empty. */
+export function DocumentPanel() {
+  const { t } = useTranslation()
+  const slot = useActiveSlot()
+  if (slot) return <DocControls slot={slot} />
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <PanelTitle>{t('doc.file')}</PanelTitle>
+      <OpenControls />
     </div>
   )
 }

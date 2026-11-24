@@ -5,7 +5,7 @@ import { CloseConfirmDialog } from './components/CloseConfirmDialog'
 import { Toaster } from './components/Toaster'
 import { Home } from './pages/home/Home'
 import { HomePanel } from './pages/home/HomePanel'
-import { DocumentEditor } from './pages/DocumentEditor'
+import { DocumentEditor, DocumentPanel } from './pages/DocumentEditor'
 import { HumanStudio } from './pages/HumanStudio'
 import { Settings } from './pages/Settings'
 import { WebcamOutput } from './pages/WebcamOutput'
@@ -25,7 +25,7 @@ type Section = { titleKey: string; center: ComponentType; right?: ComponentType 
 const SECTIONS: Record<Page, Section> = {
   home: { titleKey: 'nav.home', center: Home, right: HomePanel },
   human: { titleKey: 'nav.human', center: HumanStudio },
-  document: { titleKey: 'nav.document', center: DocumentEditor },
+  document: { titleKey: 'nav.document', center: DocumentEditor, right: DocumentPanel },
   output: { titleKey: 'nav.output', center: WebcamOutput },
   settings: { titleKey: 'nav.settings', center: Settings }
 }

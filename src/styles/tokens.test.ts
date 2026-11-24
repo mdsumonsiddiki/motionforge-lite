@@ -77,6 +77,9 @@ for (const theme of ['dark', 'light'] as const) {
       for (const [name, bg] of Object.entries(surfaces)) {
         expect(contrast(color(t['text'] ?? ''), bg), `text on ${name}`).toBeGreaterThanOrEqual(4.5)
         expect(contrast(color(t['muted'] ?? ''), bg), `muted on ${name}`).toBeGreaterThanOrEqual(4.5)
+        // Warning / error text in the panels (uncertain OCR, Delete, OCR failed).
+        expect(contrast(color(t['warn'] ?? ''), bg), `warn on ${name}`).toBeGreaterThanOrEqual(4.5)
+        expect(contrast(color(t['danger-text'] ?? ''), bg), `danger-text on ${name}`).toBeGreaterThanOrEqual(4.5)
       }
     })
 
