@@ -10,7 +10,7 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ['electron/**/*.ts', '*.config.ts', '*.config.mts', '*.config.mjs'],
+    files: ['electron/**/*.ts', 'scripts/**/*.mjs', '*.config.ts', '*.config.mts', '*.config.mjs'],
     languageOptions: { globals: globals.node }
   },
   {

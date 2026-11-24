@@ -1,0 +1,84 @@
+{
+  "space": "fffiloni/expression-editor",
+  "image": ".tmp/s9.jpg",
+  "date": "2026-11-23T23:40:48.027Z",
+  "connectMs": 3519,
+  "calls": 9,
+  "success": 8,
+  "avgMs": 2635,
+  "minMs": 2104,
+  "maxMs": 5850,
+  "results": [
+    {
+      "name": "00-neutral",
+      "key": "y0_p0_ecenter-o_mneutral",
+      "ok": true,
+      "ms": 5850,
+      "file": "docs/screenshots/phase-1/monalisa-00-neutral.webp",
+      "bytes": 175042
+    },
+    {
+      "name": "01-yaw+15",
+      "key": "y15_p0_ecenter-o_mneutral",
+      "ok": true,
+      "ms": 2178,
+      "file": "docs/screenshots/phase-1/monalisa-01-yaw+15.webp",
+      "bytes": 172978
+    },
+    {
+      "name": "02-yaw-15",
+      "key": "y-15_p0_ecenter-o_mneutral",
+      "ok": true,
+      "ms": 2125,
+      "file": "docs/screenshots/phase-1/monalisa-02-yaw-15.webp",
+      "bytes": 172772
+    },
+    {
+      "name": "03-yaw+25-clamped",
+      "key": "y25_p0_ecenter-o_mneutral",
+      "ok": true,
+      "ms": 2126,
+      "file": "docs/screenshots/phase-1/monalisa-03-yaw+25-clamped.webp",
+      "bytes": 173430
+    },
+    {
+      "name": "04-pitch+10",
+      "key": "y0_p10_ecenter-o_mneutral",
+      "ok": true,
+      "ms": 2137,
+      "file": "docs/screenshots/phase-1/monalisa-04-pitch+10.webp",
+      "bytes": 173994
+    },
+    {
+      "name": "05-pitch-10",
+      "key": "y0_p-10_ecenter-o_mneutral",
+      "ok": true,
+      "ms": 2104,
+      "file": "docs/screenshots/phase-1/monalisa-05-pitch-10.webp",
+      "bytes": 173944
+    },
+    {
+      "name": "06-eyes-left",
+      "key": "y0_p0_eleft-o_mneutral",
+      "ok": true,
+      "ms": 2337,
+      "file": "docs/screenshots/phase-1/monalisa-06-eyes-left.webp",
+      "bytes": 177084
+    },
+    {
+      "name": "07-eyes-right",
+      "key": "y0_p0_eright-o_mneutral",
+      "ok": true,
+      "ms": 2225,
+      "file": "docs/screenshots/phase-1/monalisa-07-eyes-right.webp",
+      "bytes": 169954
+    },
+    {
+      "name": "08-eyes-up",
+      "key": "y0_p0_eup-o_mneutral",
+      "ok": false,
+      "ms": 2039,
+      "error": "You have exceeded your free ZeroGPU quota (60s requested vs. 0s left). Try again in 0:00:00. Subscribe to Hugging Face PRO to get 25 min of ZeroGPU quota a day - https://huggingface.co/subscribe/pro?from=ZeroGPU"
+    }
+  ]
+}

@@ -300,7 +300,8 @@ Multi-Scene/Multi-Human, Digital Twin, VR/AR, AI World Generator, AI Acting, Vir
 - আলাদা একটা ছোট test script দিয়ে: একটা Portrait ছবি নিয়ে Yaw/Pitch, Eye direction ও open/close, আর Mouth state বদলে Cloud থেকে ছবি আনা
 - মাপতে হবে: প্রতি Pose-এ কত সেকেন্ড লাগে, প্রতি Call-এ কত খরচ, Face Identity কতটা ঠিক থাকে, পরপর Pose-এ মুখ বা পোশাক বদলে যায় কি না
 - Provider-এর ToS আর ব্যবহারের শর্ত যাচাই করা
-- **Done when:** User-কে একটা ছোট Report দেওয়া হয়েছে: Latency, খরচ, মান (Sample ছবিসহ), আর Go/No-Go সুপারিশ। **User সিদ্ধান্ত না দেওয়া পর্যন্ত Phase 2-এ যাওয়া যাবে না।**
+- **Done when:** User-কে একটা ছোট Report দেওয়া হয়েছে: Latency, খরচ, মান (Sample ছবিসহ), আর Go/No-Go সুপারিশ। **User সিদ্ধান্ত না দেওয়া পর্যন্ত Phase 6-এ যাওয়া যাবে না।**
+- User-এর সিদ্ধান্ত (2026-11-24): quota শেষ, বাকি ৪টা test পরে হবে। এর মধ্যে Phase 2, 3, 4, 5 করা যাবে। Phase 6–9 শুরু হবে শুধু Phase 1 শেষ হলে আর User Go দিলে।
 
 ### Phase 2 — App Shell
 - Dashboard, Routing, Dark/Light Theme, English/বাংলা, Settings Page (Language, Theme, OBS Path)
@@ -354,7 +355,7 @@ Multi-Scene/Multi-Human, Digital Twin, VR/AR, AI World Generator, AI Acting, Vir
 
 ### Progress Checklist
 - [x] Phase 0 — Setup
-- [ ] Phase 1 — Cloud Pose Feasibility
+- [ ] Phase 1 — Cloud Pose Feasibility (আংশিক: 8/12 test)
 - [ ] Phase 2 — App Shell
 - [ ] Phase 3 — Storage/Backup
 - [ ] Phase 4 — Document Editor
