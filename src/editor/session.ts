@@ -10,11 +10,10 @@ import { inpaintBox } from '../workers/inpaintClient'
 import { parseEdits, serializeEdits } from './edits'
 import { readJpegOrientation } from './exif'
 import { reportInpaintFailure } from './inpaintFailure'
-import { cropPixels } from './inpaintPlan'
+import { cropPixels, findText } from './inpaintPlan'
 import { fontCss, patchKey, renderDocument, type RenderAssets } from './render'
-import { maskTextColor, textMask } from './textMask'
+import { maskTextColor } from './textMask'
 import { estimateFontSize, estimateTextColor, matchPlacement, MEASURE_SIZE } from './textStyle'
-import { clampRect } from './geometry'
 import type { TextStyle } from './edits'
 import { MAX_SLOTS, type Layer, type OcrBox } from './types'
 
@@ -225,19 +224,20 @@ export async function matchStyle(key: string, box: OcrBox, fontFamily: string): 
   const rt = runtimes.get(key)
   const fallback: TextStyle = { fontFamily, fontSize: estimateFontSize(box.rect.h), color: '#000000' }
   if (!rt) return fallback
-  const rect = clampRect(box.rect, rt.pixels.width, rt.pixels.height)
-  if (rect.w === 0 || rect.h === 0) return fallback
-  const px = cropPixels(rt.pixels, rect)
-  const tm = textMask(px, rect.w, rect.h)
-  const color = maskTextColor(px, tm) ?? estimateTextColor(px)
-  if (!tm.ink) return { ...fallback, color }
+  // Letters of the box incl. a matra just above it, so the glyph height is complete.
+  const region = findText(rt.pixels, box.rect)
+  if (!region) return fallback
+  const { area } = region
+  const px = cropPixels(rt.pixels, area)
+  const color = maskTextColor(px, { mask: region.text, textIsDark: region.textIsDark }) ?? estimateTextColor(px)
+  if (!region.ink) return { ...fallback, color }
 
   // Measure the old (OCR) text in the chosen font, once the font is loaded.
   await document.fonts.load(fontCss(MEASURE_SIZE, fontFamily), box.text).catch(() => [])
   measureCtx ??= new OffscreenCanvas(1, 1).getContext('2d')
   const ctx = measureCtx
   if (!ctx) return { ...fallback, color }
-  const placed = matchPlacement(rect, tm.ink, box.text, (text) => {
+  const placed = matchPlacement(area, region.ink, box.text, (text) => {
     ctx.font = fontCss(MEASURE_SIZE, fontFamily)
     ctx.textBaseline = 'alphabetic'
     const m = ctx.measureText(text)

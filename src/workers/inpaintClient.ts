@@ -43,7 +43,7 @@ function getWorker(): Worker {
 const opencvUrl = (): string => new URL('opencv/opencv.js', document.baseURI).href
 
 /**
- * Removes the old letters inside `box` (spec section 8, step 4).
+ * Removes the old letters inside `box` (and a matra just above it) (spec section 8, step 4).
  * The text mask is computed on the main thread (one line box, cheap); only TELEA
  * inpainting of a patterned background runs in the worker.
  * @param original pixels of the untouched original image
@@ -51,12 +51,12 @@ const opencvUrl = (): string => new URL('opencv/opencv.js', document.baseURI).hr
 export function inpaintBox(original: Pixels, box: Rect): Promise<Patch | null> {
   const plan = planRemoval(original, box)
   if (!plan) return Promise.resolve(null)
-  const at = { x: plan.box.x, y: plan.box.y }
+  const at = { x: plan.area.x, y: plan.area.y }
 
   // Plain background (e.g. a white page): fill the letter pixels with that color.
   if (plan.solid) {
     const color = plan.solid
-    const image = new ImageData(buildPatch(plan, () => color), plan.box.w, plan.box.h)
+    const image = new ImageData(buildPatch(plan, () => color), plan.area.w, plan.area.h)
     return Promise.resolve({ ...at, image })
   }
 
@@ -77,7 +77,7 @@ export function inpaintBox(original: Pixels, box: Rect): Promise<Patch | null> {
     pending.set(id, { resolve, reject })
     getWorker().postMessage(req, [pixels.buffer, mask.buffer])
   }).then((buffer) => {
-    const image = new ImageData(buildPatch(plan, cropColor(plan, new Uint8ClampedArray(buffer))), plan.box.w, plan.box.h)
+    const image = new ImageData(buildPatch(plan, cropColor(plan, new Uint8ClampedArray(buffer))), plan.area.w, plan.area.h)
     return { ...at, image }
   })
 }

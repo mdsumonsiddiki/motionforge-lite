@@ -99,4 +99,12 @@ Claude Code প্রতিটা Phase শেষে এখানে একট�
 - Spec section 8: updated with these user decisions (replaces the 15% padding decision).
 - Tests: typecheck ✅ lint ✅ test ✅ (165 tests; new textMask, inpaintPlan, solidFill, textStyle.matchPlacement, ocrBoxes, render anchor/drawImage, edits anchor, styles contrast) build ✅ check-inpaint-worker build+dev ✅ (also checks a pixel outside the mask is unchanged).
 - Manual test for user: open a document with text over a photo/face → edit a box → Apply → only the letters change, the face stays. New text has the same height, baseline and colour as the old. A handwritten image → yellow "Uncertain" boxes + warning. Select a box → drag/resize it → Apply. Dark mode → field borders and focus ring are clearly visible.
-- Open issues: a matra outside the OCR box is no longer removed automatically — enlarge the box first. Font matching relies on the OCR text; for badly recognised lines the size may be off (falls back to max 1.5 × box height). Adjusting a box is not part of undo/redo.
+- Open issues: a matra outside the OCR box is no longer removed automatically — enlarge the box first (resolved by the next entry). Font matching relies on the OCR text; for badly recognised lines the size may be off (falls back to max 1.5 × box height). Adjusting a box is not part of undo/redo.
+
+## Fix — Bangla matra above the OCR box (2026-11-24)
+- `inpaintPlan.findText`: the text search reaches ~25% of the box height (min 3 px) above the box. In that strip only text-coloured pixels (same Otsu threshold/polarity as the box) that are 8-connected to the letters inside the box are taken (flood fill) — the matra, not unrelated marks above. Strip pixels are removed only within the dilation radius of matra pixels, so a letter touching the box top does not erase background above it.
+- Patch / crop / solid-fill now use the "area" (box + strip). `matchStyle` uses the same region, so the matra counts in the glyph height (font size).
+- Spec section 8: matra exception recorded as user decision.
+- Tests: typecheck ✅ lint ✅ test ✅ (169; new: matra above the box removed, unconnected dot kept, no growth without matra, ink box incl. matra) build ✅ check-inpaint-worker build+dev ✅.
+- Manual test for user: Bangla document where the OCR box cuts the matra → edit the line → Apply → the old matra is gone too; marks above the line that do not touch the letters stay.
+- Open issues: a matra more than ~25% of the box height above the box is still not reached (adjust the box).

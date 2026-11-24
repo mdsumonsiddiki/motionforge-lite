@@ -25,9 +25,15 @@ export type TextMask = {
   contrast: number
   /** True when the text is darker than its background. */
   textIsDark: boolean
+  /** Otsu threshold: luminance ≤ threshold is the dark class. */
+  threshold: number
 }
 
-const lum = (r: number, g: number, b: number): number => 0.299 * r + 0.587 * g + 0.114 * b
+/** True when a pixel of luminance `l` belongs to the text class of `tm`. */
+export const isTextLum = (tm: Pick<TextMask, 'threshold' | 'textIsDark'>, l: number): boolean =>
+  l <= tm.threshold === tm.textIsDark
+
+export const lum =(r: number, g: number, b: number): number => 0.299 * r + 0.587 * g + 0.114 * b
 
 /** Otsu threshold of a 256-bin histogram: values ≤ threshold are one class. */
 export function otsuThreshold(hist: readonly number[], total: number): number {
@@ -58,7 +64,7 @@ export function otsuThreshold(hist: readonly number[], total: number): number {
  * Rows/columns with only a stray pixel or two are noise (JPEG speckles, a photo edge),
  * not letters; they must not stretch the ink box.
  */
-function inkBox(mask: Uint8Array, w: number, h: number): Rect | null {
+export function inkBox(mask: Uint8Array, w: number, h: number): Rect | null {
   const minRow = Math.max(1, Math.round(w * 0.01))
   let top = -1
   let bottom = -1
@@ -95,7 +101,7 @@ export function textMask(rgba: Uint8ClampedArray | Uint8Array, w: number, h: num
     lums[i] = v
     hist[v] = (hist[v] ?? 0) + 1
   }
-  const empty: TextMask = { w, h, mask: new Uint8Array(n), ink: null, contrast: 0, textIsDark: true }
+  const empty: TextMask = { w, h, mask: new Uint8Array(n), ink: null, contrast: 0, textIsDark: true, threshold: 0 }
   if (n === 0) return empty
 
   const t = otsuThreshold(hist, n)
@@ -119,7 +125,7 @@ export function textMask(rgba: Uint8ClampedArray | Uint8Array, w: number, h: num
     const dark = (lums[i] ?? 0) <= t
     mask[i] = dark === textIsDark ? 1 : 0
   }
-  return { w, h, mask, ink: inkBox(mask, w, h), contrast, textIsDark }
+  return { w, h, mask, ink: inkBox(mask, w, h), contrast, textIsDark, threshold: t }
 }
 
 /** Dilation radius in px: 2 for small text, 3 for bigger text (covers anti-aliased edges). */
@@ -149,12 +155,15 @@ export function dilate(mask: Uint8Array, w: number, h: number, r: number): Uint8
   return out
 }
 
+/** True when the box has clearly visible letters (enough contrast, some ink). */
+export const hasClearText = (tm: TextMask): boolean => tm.contrast >= MIN_CONTRAST && tm.ink !== null
+
 /**
  * The area to remove inside the box: the dilated text mask, or the whole box when no
  * clear text is found (very low contrast) so the old text never stays behind silently.
  */
 export function removalMask(tm: TextMask): Uint8Array {
-  if (tm.contrast < MIN_CONTRAST || !tm.ink) return new Uint8Array(tm.w * tm.h).fill(1)
+  if (!hasClearText(tm)) return new Uint8Array(tm.w * tm.h).fill(1)
   return dilate(tm.mask, tm.w, tm.h, dilateRadius(tm.h))
 }
 
@@ -165,7 +174,10 @@ const toHex = (n: number): string => Math.round(n).toString(16).padStart(2, '0')
  * (the inner half of the strokes; anti-aliased edges are mixed with the paper color).
  * Returns null when there are no text pixels.
  */
-export function maskTextColor(rgba: Uint8ClampedArray | Uint8Array, tm: TextMask): string | null {
+export function maskTextColor(
+  rgba: Uint8ClampedArray | Uint8Array,
+  tm: Pick<TextMask, 'mask' | 'textIsDark'>
+): string | null {
   const px: { l: number; r: number; g: number; b: number }[] = []
   for (let i = 0; i < tm.mask.length; i++) {
     if (!tm.mask[i]) continue
