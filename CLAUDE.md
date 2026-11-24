@@ -13,6 +13,12 @@
 - When the blocker is resolved, delete `BLOCKED.md` and continue.
 - Keep `PROGRESS_LOG.md` and the spec checklist updated after every task (the user's reviewer checks progress there).
 
+## Usage limit safety (permanent rules)
+- Do all UI redesign work on branch `ui-redesign` (created from `main`). Merge to `main` only when all steps pass tests and the user approves.
+- Commit + push after every small, working sub-step (WIP commits allowed on the branch; tests must pass).
+- On every new session start: run `git status` first. If there are uncommitted changes, run the tests, fix/finish them and commit before anything else. Write what you found in `PROGRESS_LOG.md`.
+- Never run `git reset --hard`, `git checkout .`, `git clean`, or anything else that discards work.
+
 ## Talking to the user
 - The user is a MERN developer. Keep code, file names and technical terms in English.
 - If something in the spec is unclear or contradictory, ask the user (using the "⛔ NEED USER:" format above). Do not guess.
