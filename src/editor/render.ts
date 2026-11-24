@@ -29,6 +29,29 @@ export function lineCenters(boxY: number, boxH: number, fontSize: number, lines:
   return Array.from({ length: lines }, (_, i) => first + i * step)
 }
 
+/** Text is never shrunk below this size, even if it still does not fit. */
+export const MIN_FIT_FONT_PX = 6
+
+/**
+ * Font size that keeps the text inside its box: the widest line must fit the box width and
+ * all lines together must fit the box height. Never larger than the requested size.
+ * Text width grows linearly with the font size, so one measurement at the requested size
+ * is enough.
+ * @param measure width of one line at the given font size (canvas measureText in the app)
+ */
+export function fitFontSize(
+  lines: readonly string[],
+  fontSize: number,
+  box: { w: number; h: number },
+  measure: (line: string, size: number) => number
+): number {
+  const widest = Math.max(0, ...lines.map((line) => measure(line, fontSize)))
+  const byWidth = widest > box.w && widest > 0 ? (fontSize * box.w) / widest : fontSize
+  const byHeight = box.h / (Math.max(1, lines.length) * LINE_HEIGHT)
+  const fitted = Math.floor(Math.min(fontSize, byWidth, Math.max(byHeight, 0)) * 10) / 10
+  return Math.max(Math.min(MIN_FIT_FONT_PX, fontSize), fitted)
+}
+
 /**
  * Draws the document at full resolution: original → layers in order.
  * Text layer = inpainted patch (old text removed) + new text.
@@ -51,9 +74,14 @@ export function renderDocument(
       if (patch) ctx.putImageData(patch.image, patch.x, patch.y)
       else if (!assets.failedPatches.has(layer.boxId)) continue
       const lines = layer.text.split('\n')
-      const ys = lineCenters(layer.rect.y, layer.rect.h, layer.fontSize, lines.length)
       ctx.save()
-      ctx.font = fontCss(layer.fontSize, layer.fontFamily)
+      // Long text is drawn smaller so it stays inside the OCR box (the layer keeps its size).
+      const size = fitFontSize(lines, layer.fontSize, layer.rect, (line, s) => {
+        ctx.font = fontCss(s, layer.fontFamily)
+        return ctx.measureText(line).width
+      })
+      const ys = lineCenters(layer.rect.y, layer.rect.h, size, lines.length)
+      ctx.font = fontCss(size, layer.fontFamily)
       ctx.fillStyle = layer.color
       ctx.textBaseline = 'middle'
       lines.forEach((line, i) => ctx.fillText(line, layer.rect.x, ys[i] ?? 0))

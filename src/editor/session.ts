@@ -8,6 +8,7 @@ import { useDocumentStore, type OpenResult, type Slot } from '../store/documentS
 import { recognize } from '../workers/ocrClient'
 import { inpaintBox } from '../workers/inpaintClient'
 import { parseEdits, serializeEdits } from './edits'
+import { readJpegOrientation } from './exif'
 import { fontCss, renderDocument, type RenderAssets } from './render'
 import { MAX_SLOTS, type Layer } from './types'
 
@@ -35,9 +36,14 @@ function blobOf(data: Uint8Array, type: ImageType): Blob {
   return new Blob([data as Uint8Array<ArrayBuffer>], { type: MIME[type] })
 }
 
-/** Decodes the original image once and keeps its pixels for inpainting. */
+/**
+ * Decodes the original image once and keeps its pixels for inpainting.
+ * EXIF orientation is applied, so preview, inpaint, export and OCR all use the upright image.
+ */
 async function decode(original: { type: ImageType; data: Uint8Array }): Promise<Runtime> {
-  const bitmap = await createImageBitmap(blobOf(original.data, original.type))
+  const bitmap = await createImageBitmap(blobOf(original.data, original.type), {
+    imageOrientation: 'from-image'
+  })
   const canvas = new OffscreenCanvas(bitmap.width, bitmap.height)
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('Canvas not available')
@@ -109,13 +115,29 @@ export function closeSlot(key: string): void {
   store().closeSlot(key)
 }
 
+/**
+ * The image given to OCR, in the same (upright) coordinates as the preview.
+ * A rotated phone JPEG is re-encoded from the decoded, already-rotated pixels, because
+ * tesseract.js does not reliably apply EXIF orientation itself (see exif.ts).
+ */
+async function ocrSource(slot: Slot, rt: Runtime | undefined): Promise<Blob> {
+  const { type, data } = slot.original
+  if (type !== 'jpg' || !rt || readJpegOrientation(data) === 1) return blobOf(data, type)
+  const canvas = new OffscreenCanvas(rt.pixels.width, rt.pixels.height)
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('Canvas not available')
+  ctx.putImageData(rt.pixels, 0, 0)
+  return canvas.convertToBlob({ type: 'image/png' })
+}
+
 /** Runs OCR in the worker and stores the line boxes, with progress (spec section 8, step 1). */
 export async function runOcr(key: string): Promise<void> {
   const slot = getSlot(key)
   if (!slot) return
   store().update(key, { ocrStatus: 'running', ocrProgress: 0 })
   try {
-    const boxes = await recognize(blobOf(slot.original.data, slot.original.type), (p) => {
+    const source = await ocrSource(slot, runtimes.get(key))
+    const boxes = await recognize(source, (p) => {
       if (getSlot(key)) store().update(key, { ocrProgress: p })
     })
     if (getSlot(key)) store().update(key, { ocr: boxes, ocrStatus: 'done', ocrProgress: 1 })
