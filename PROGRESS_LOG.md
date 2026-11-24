@@ -123,3 +123,12 @@ Claude Code প্রতিটা Phase শেষে এখানে একট�
 - Tests: typecheck ✅ lint ✅ test ✅ (172) build ✅.
 - Manual test for user: Settings → Language বাংলা → Settings page, Document Editor buttons (Save, Apply, Undo/Redo, Font) are in Bangla.
 - Open issues: `output.*` still has English-only Bangla values (Zoom In, Background, Original…); translate when Webcam Output may be changed.
+
+## UI Redesign — Step 1: tokens, depth classes, fonts, theme wiring, Reduce effects (2026-11-25, branch `ui-redesign`)
+- Source: `docs/UI_REDESIGN.md` + `docs/ui-reference/AppShell.reference.html` (user-approved 2026-11-25; spec section 6 updated).
+- `src/styles/tokens.css`: every section-2 token as CSS variables for `[data-theme="dark"]` / `[data-theme="light"]`, fixed colours, `.as-btn` / `.as-raise` / `.as-sink` / `.as-live` / `.as-range` copied from the reference; `.as-glass` for the light blur. Reduce effects (`data-reduce-effects="true"`) and `prefers-reduced-motion` turn off blur, hover lift and pulsing.
+- Fonts: `@fontsource/poppins` 400/500/600/700 + Hind Siliguri 500 (offline). UI font stack `'Poppins', 'Hind Siliguri', 'Noto Sans Bengali', system-ui, sans-serif`.
+- Theme wiring: `<html data-theme>` follows Settings → Theme (the `dark` class stays for not-yet-reskinned screens). New setting `reduceEffects` (default off, validated, persisted) + Settings → "Reduce effects" Off / On (en + bn).
+- Form fields: border `var(--input-border)` and focus ring 2px #8b5cf6, offset 3px, in both themes.
+- Tests: new `styles/tokens.test.ts` (text / muted ≥ 4.5:1 on every surface, accent / on-accent ≥ 4.5:1, input border + focus ring ≥ 3:1, both themes); `styles.test.ts` now checks both themes; settings validation + persistence for `reduceEffects`. typecheck ✅ lint ✅ test ✅ (180) build ✅.
+- Manual test for user: Settings → Theme Light / Dark → text font is Poppins; Reduce effects On → restart → still On.

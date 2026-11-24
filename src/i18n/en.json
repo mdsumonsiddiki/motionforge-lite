@@ -29,7 +29,11 @@
     "obsPathHint": "Path to obs64.exe (OBS Studio 28 or newer).",
     "obsBrowse": "Browse…",
     "obsDetect": "Auto-detect",
-    "obsBrowseTitle": "Select obs64.exe"
+    "obsBrowseTitle": "Select obs64.exe",
+    "reduceEffects": "Reduce effects",
+    "reduceEffectsHint": "Turns off glass blur and button animations. Helps on PCs with 4 GB RAM or no graphics card.",
+    "off": "Off",
+    "on": "On"
   },
   "library": {
     "characters": "Saved Characters",

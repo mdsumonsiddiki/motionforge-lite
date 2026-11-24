@@ -3,7 +3,7 @@
  * Pure module: no Electron or Node imports, so it can be used everywhere and unit-tested.
  *
  * Spec section 11: Language, Theme, OBS Path (Phase 2). API Key, Backup and Restore
- * are added in later phases.
+ * are added in later phases. UI redesign (docs/UI_REDESIGN.md): Reduce effects.
  */
 
 export type Language = 'en' | 'bn'
@@ -13,6 +13,8 @@ export type Settings = {
   language: Language
   theme: Theme
   obsPath: string
+  /** Turns off glass blur, hover lift and pulsing (UI_REDESIGN.md section 3). Default off. */
+  reduceEffects: boolean
 }
 
 export const LANGUAGES: readonly Language[] = ['en', 'bn']
@@ -20,7 +22,7 @@ export const THEMES: readonly Theme[] = ['dark', 'light']
 
 /** Default language is English (spec section 3). */
 export function defaultSettings(obsPath: string): Settings {
-  return { language: 'en', theme: 'dark', obsPath }
+  return { language: 'en', theme: 'dark', obsPath, reduceEffects: false }
 }
 
 /** Max length for a stored path; anything longer is treated as invalid. */
@@ -42,6 +44,7 @@ export function pickValidSettings(patch: unknown): Partial<Settings> {
   if (typeof patch.obsPath === 'string' && patch.obsPath.length <= MAX_PATH_LENGTH) {
     out.obsPath = patch.obsPath.trim()
   }
+  if (typeof patch.reduceEffects === 'boolean') out.reduceEffects = patch.reduceEffects
   return out
 }
 

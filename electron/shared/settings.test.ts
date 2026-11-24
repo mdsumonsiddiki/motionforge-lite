@@ -5,7 +5,12 @@ describe('settings validation', () => {
   const base = defaultSettings('C:\\obs\\obs64.exe')
 
   it('defaults to English and dark theme', () => {
-    expect(base).toEqual({ language: 'en', theme: 'dark', obsPath: 'C:\\obs\\obs64.exe' })
+    expect(base).toEqual({
+      language: 'en',
+      theme: 'dark',
+      obsPath: 'C:\\obs\\obs64.exe',
+      reduceEffects: false
+    })
   })
 
   it('keeps valid fields', () => {
@@ -17,8 +22,14 @@ describe('settings validation', () => {
   })
 
   it('drops unknown keys and invalid values', () => {
-    expect(pickValidSettings({ language: 'fr', theme: 1, obsPath: 5, apiKey: 'x' })).toEqual({})
+    expect(
+      pickValidSettings({ language: 'fr', theme: 1, obsPath: 5, apiKey: 'x', reduceEffects: 'yes' })
+    ).toEqual({})
     expect(pickValidSettings({ obsPath: 'a'.repeat(2000) })).toEqual({})
+  })
+
+  it('keeps Reduce effects (boolean only)', () => {
+    expect(pickValidSettings({ reduceEffects: true })).toEqual({ reduceEffects: true })
   })
 
   it('handles non-object input', () => {

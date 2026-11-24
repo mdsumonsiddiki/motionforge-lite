@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './styles/tokens.css';
 
 /* Dark mode is driven by a `dark` class on <html> (toggled from the theme store). */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -11,21 +12,22 @@ body,
 }
 
 /*
- * Form fields in dark mode: border and focus ring must stand out against the dark
- * backgrounds (#171717 / #0a0a0a) with a contrast of at least 3:1 (WCAG 1.4.11).
- * #8a8a8a ≈ 5.2:1, #818cf8 ≈ 5.9:1 on #171717 — checked by src/styles.test.ts.
+ * Form fields in both themes: border and focus ring must stand out against the field and
+ * panel backgrounds with a contrast of at least 3:1 (WCAG 1.4.11).
+ * Border = --input-border (#8a8a8a dark, #8f86b8 light), focus ring #8b5cf6.
+ * Checked by src/styles.test.ts and src/styles/tokens.test.ts.
  * Unlayered CSS, so it wins over Tailwind's border utilities on every input.
  */
-.dark input,
-.dark textarea,
-.dark select {
-  border-color: #8a8a8a;
+input,
+textarea,
+select {
+  border-color: var(--input-border);
 }
 
-.dark input:focus-visible,
-.dark textarea:focus-visible,
-.dark select:focus-visible {
-  border-color: #818cf8;
-  outline: 2px solid #818cf8;
-  outline-offset: 1px;
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  border-color: #8b5cf6;
+  outline: 2px solid #8b5cf6;
+  outline-offset: 3px;
 }

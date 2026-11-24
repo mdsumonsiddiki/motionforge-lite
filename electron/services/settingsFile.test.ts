@@ -18,33 +18,41 @@ describe('settingsFile', () => {
     expect(loadSettings(file, 'C:\\obs.exe')).toEqual({
       language: 'en',
       theme: 'dark',
-      obsPath: 'C:\\obs.exe'
+      obsPath: 'C:\\obs.exe',
+      reduceEffects: false
     })
   })
 
   it('round-trips saved settings (survives a restart)', () => {
-    saveSettings(file, { language: 'bn', theme: 'light', obsPath: 'D:\\obs.exe' })
+    saveSettings(file, {
+      language: 'bn',
+      theme: 'light',
+      obsPath: 'D:\\obs.exe',
+      reduceEffects: true
+    })
     expect(existsSync(`${file}.tmp`)).toBe(false)
     expect(loadSettings(file, 'C:\\obs.exe')).toEqual({
       language: 'bn',
       theme: 'light',
-      obsPath: 'D:\\obs.exe'
+      obsPath: 'D:\\obs.exe',
+      reduceEffects: true
     })
   })
 
   it('falls back to defaults on a corrupt file', () => {
-    saveSettings(file, { language: 'bn', theme: 'light', obsPath: 'x' })
+    saveSettings(file, { language: 'bn', theme: 'light', obsPath: 'x', reduceEffects: false })
     writeFileSync(file, '{ not json', 'utf8')
     expect(loadSettings(file, 'C:\\obs.exe').language).toBe('en')
   })
 
   it('ignores invalid fields in the file', () => {
-    saveSettings(file, { language: 'bn', theme: 'light', obsPath: 'x' })
+    saveSettings(file, { language: 'bn', theme: 'light', obsPath: 'x', reduceEffects: false })
     writeFileSync(file, JSON.stringify({ language: 'de', theme: 'light' }), 'utf8')
     expect(loadSettings(file, 'C:\\obs.exe')).toEqual({
       language: 'en',
       theme: 'light',
-      obsPath: 'C:\\obs.exe'
+      obsPath: 'C:\\obs.exe',
+      reduceEffects: false
     })
   })
 })

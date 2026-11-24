@@ -29,7 +29,11 @@
     "obsPathHint": "obs64.exe-এর Path (OBS Studio 28 বা নতুন)।",
     "obsBrowse": "খুঁজুন…",
     "obsDetect": "নিজে খুঁজে নিন",
-    "obsBrowseTitle": "obs64.exe বেছে নিন"
+    "obsBrowseTitle": "obs64.exe বেছে নিন",
+    "reduceEffects": "ইফেক্ট কমান",
+    "reduceEffectsHint": "কাচের মতো ঝাপসা ভাব আর বাটনের নড়াচড়া বন্ধ করে। ৪ GB RAM বা Graphics Card ছাড়া PC-তে সুবিধা হয়।",
+    "off": "বন্ধ",
+    "on": "চালু"
   },
   "library": {
     "characters": "সংরক্ষিত Character",

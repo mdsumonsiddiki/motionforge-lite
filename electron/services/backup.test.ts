@@ -43,7 +43,9 @@ describe('backup / restore', () => {
   afterEach(() => rmSync(tmp, { recursive: true, force: true }))
 
   it('names the file with a local timestamp', () => {
-    expect(backupFileName(new Date(2026, 10, 4, 9, 5))).toBe('MotionForge-Backup-2026-11-04-0905.zip')
+    expect(backupFileName(new Date(2026, 10, 4, 9, 5))).toBe(
+      'MotionForge-Backup-2026-11-04-0905.zip'
+    )
   })
 
   it('backup → delete everything → restore brings it all back (Phase 3 "Done when")', async () => {
@@ -54,7 +56,12 @@ describe('backup / restore', () => {
       files: { 'generated.png': Buffer.from('gen'), 'poses/y5_p0.png': Buffer.from('p') }
     })
     const doc = storage.saveDocument({ name: 'Bill', files: { 'original.jpg': Buffer.from('o') } })
-    saveSettings(join(userData, 'settings.json'), { language: 'bn', theme: 'light', obsPath: 'x' })
+    saveSettings(join(userData, 'settings.json'), {
+      language: 'bn',
+      theme: 'light',
+      obsPath: 'x',
+      reduceEffects: false
+    })
     // A file that must NOT go into the backup (e.g. future encrypted API key).
     writeFileSync(join(userData, 'secret.bin'), 'key')
 
@@ -107,7 +114,12 @@ describe('backup / restore', () => {
     storage.saveDocument({ name: 'InBackup' })
     await createBackup(userData, zip)
     storage.saveDocument({ name: 'Current' })
-    saveSettings(join(userData, 'settings.json'), { language: 'bn', theme: 'light', obsPath: 'x' })
+    saveSettings(join(userData, 'settings.json'), {
+      language: 'bn',
+      theme: 'light',
+      obsPath: 'x',
+      reduceEffects: false
+    })
 
     // Fail on the first move from staging into userData (after current data was moved aside).
     const failingRename = (from: string, to: string): void => {

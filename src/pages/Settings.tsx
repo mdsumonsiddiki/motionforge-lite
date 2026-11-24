@@ -45,6 +45,17 @@ export function Settings() {
         />
       </Field>
 
+      <Field label={t('settings.reduceEffects')} hint={t('settings.reduceEffectsHint')}>
+        <Segmented<'off' | 'on'>
+          value={settings.reduceEffects ? 'on' : 'off'}
+          onChange={(v) => void update({ reduceEffects: v === 'on' })}
+          options={[
+            { value: 'off', label: t('settings.off') },
+            { value: 'on', label: t('settings.on') }
+          ]}
+        />
+      </Field>
+
       <Field label={t('settings.obsPath')} hint={t('settings.obsPathHint')}>
         {/* key: re-mount the input when the saved path changes (Browse / Auto-detect). */}
         <ObsPathInput key={settings.obsPath} settings={settings} onSave={update} />

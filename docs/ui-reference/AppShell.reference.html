@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MotionForge Lite — App Shell</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Hind+Siliguri:wght@500&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}a:hover{opacity:.85}
+.as-btn{transition:transform .15s, box-shadow .2s, background .2s}
+.as-btn:focus-visible,.as-in:focus-visible{outline:2px solid #8b5cf6;outline-offset:3px}
+.as-dark .as-btn{border-color:transparent !important;box-shadow:7px 7px 15px #0f1013,-5px -5px 12px #363940,inset 1px 1px 0 rgba(255,255,255,0.05) !important}
+.as-dark .as-btn:hover{transform:translateY(-3px);box-shadow:11px 11px 22px #0c0d10,-7px -7px 16px #3a3d44,inset 1px 1px 0 rgba(255,255,255,0.06) !important}
+.as-dark .as-btn:active,.as-dark .as-btn.as-on{transform:none;box-shadow:inset 6px 6px 12px #121316,inset -5px -5px 10px #34373e !important}
+.as-dark .as-raise{box-shadow:12px 12px 26px #101114,-8px -8px 20px #33363c}
+.as-dark .as-sink{box-shadow:inset 6px 6px 14px #131417,inset -6px -6px 14px #2f3238}
+.as-light .as-btn{box-shadow:0 10px 24px rgba(91,43,224,0.16),inset 0 1px 0 rgba(255,255,255,0.95) !important}
+.as-light .as-btn:hover{transform:translateY(-3px);box-shadow:0 16px 32px rgba(91,43,224,0.22),inset 0 1px 0 rgba(255,255,255,0.95) !important}
+.as-light .as-btn:active,.as-light .as-btn.as-on{transform:none;box-shadow:inset 0 3px 9px rgba(60,20,160,0.28) !important}
+.as-light .as-raise{box-shadow:0 16px 36px rgba(91,43,224,0.14),inset 0 1px 0 rgba(255,255,255,0.95)}
+.as-light .as-sink{box-shadow:inset 0 2px 8px rgba(91,43,224,0.12)}
+.as-live{animation:aslive 1.4s ease-in-out infinite}
+@keyframes aslive{0%{box-shadow:0 0 0 0 rgba(34,197,94,.7)}70%{box-shadow:0 0 0 9px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.as-range{width:100%;accent-color:#8b5cf6}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="min-height: 900px; box-sizing: border-box; background: {{t.page}}; padding: 20px; font-family: 'Poppins', system-ui, sans-serif; color: {{t.text}}">
+<div style="max-width: 1440px; margin: 0 auto; min-height: 860px; background: {{t.shell}}; border: 1px solid {{t.shellBorder}}; border-radius: 28px; overflow: hidden; display: flex; flex-wrap: wrap; box-shadow: {{t.shellShadow}}; backdrop-filter: {{t.blur}}">
+
+<nav aria-label="Main" style="flex: 0 0 {{sideW}}; box-sizing: border-box; background: {{t.side}}; border-right: 1px solid {{t.border}}; padding: 22px 16px; display: flex; flex-direction: column; gap: 14px; transition: flex-basis .25s">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 6px 18px; min-height: 40px">
+<span class="as-raise" style="flex: 0 0 40px; width: 40px; height: 40px; border-radius: 13px; background: {{t.accent}}; color: {{t.onAccent}}; font-weight: 700; display: flex; align-items: center; justify-content: center">M</span>
+<sc-if value="{{showLabels}}" hint-placeholder-val="{{ true }}"><span style="font-size: 17px; font-weight: 700; white-space: nowrap">MotionForge</span></sc-if>
+</div>
+
+<button class="as-btn {{nav.home.cls}}" onClick="{{goHome}}" aria-label="Home" style="min-height: 52px; display: flex; align-items: center; gap: 12px; padding: 0 15px; border-radius: 16px; border: 0; cursor: pointer; font-family: inherit; font-size: 14px; background: {{nav.home.bg}}; color: {{nav.home.fg}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: 0 0 20px"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>
+<sc-if value="{{showLabels}}" hint-placeholder-val="{{ true }}"><span>Home</span></sc-if>
+</button>
+<sc-if value="{{showLabels}}" hint-placeholder-val="{{ true }}"><span style="font-size: 11px; font-weight: 600; letter-spacing: 0.12em; color: {{t.muted}}; padding: 6px 14px 0">STUDIOS</span></sc-if>
+<button class="as-btn {{nav.human.cls}}" onClick="{{goHuman}}" aria-label="Human Studio" style="min-height: 52px; display: flex; align-items: center; gap: 12px; padding: 0 15px; border-radius: 16px; border: 0; cursor: pointer; font-family: inherit; font-size: 14px; background: {{nav.human.bg}}; color: {{nav.human.fg}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: 0 0 20px"><circle cx="12" cy="8" r="4"></circle><path d="M5 21c0-4 3.1-6.5 7-6.5s7 2.5 7 6.5"></path></svg>
+<sc-if value="{{showLabels}}" hint-placeholder-val="{{ true }}"><span>Human Studio</span></sc-if>
+</button>
+<button class="as-btn {{nav.doc.cls}}" onClick="{{goDoc}}" aria-label="Document Editor" style="min-height: 52px; display: flex; align-items: center; gap: 12px; padding: 0 15px; border-radius: 16px; border: 0; cursor: pointer; font-family: inherit; font-size: 14px; background: {{nav.doc.bg}}; color: {{nav.doc.fg}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: 0 0 20px"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5M9 13h6M9 17h4"></path></svg>
+<sc-if value="{{showLabels}}" hint-placeholder-val="{{ true }}"><span>Document Editor</span></sc-if>
+</button>
+<button class="as-btn {{nav.cam.cls}}" onClick="{{goCam}}" aria-label="Webcam Output" style="min-height: 52px; display: flex; align-items: center; gap: 12px; padding: 0 15px; border-radius: 16px; border: 0; cursor: pointer; font-family: inherit; font-size: 14px; background: {{nav.cam.bg}}; color: {{nav.cam.fg}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: 0 0 20px"><rect x="3" y="6" width="13" height="12" rx="2"></rect><path d="M16 10l5-3v10l-5-3z"></path></svg>
+<sc-if value="{{showLabels}}" hint-placeholder-val="{{ true }}"><span>Webcam Output</span></sc-if>
+</button>
+
+<button class="as-btn" aria-label="Settings" style="margin-top: auto; min-height: 52px; display: flex; align-items: center; gap: 12px; padding: 0 15px; border-radius: 16px; border: 0; cursor: pointer; font-family: inherit; font-size: 14px; background: {{nav.set.bg}}; color: {{nav.set.fg}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 20px"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>
+<sc-if value="{{showLabels}}" hint-placeholder-val="{{ true }}"><span>Settings</span></sc-if>
+</button>
+<div style="position: relative; padding-top: 10px">
+<button class="as-btn {{profileCls}}" onClick="{{toggleProfile}}" aria-label="Profile menu" aria-expanded="{{profileOpen}}" style="width: 100%; min-height: 68px; display: flex; align-items: center; justify-content: {{profileJustify}}; gap: 12px; padding: 9px; border-radius: 22px; border: 1px solid {{t.goldLine}}; cursor: pointer; background: {{t.profileBg}}; color: {{t.text}}; font-family: inherit; text-align: left">
+<span style="position: relative; flex: 0 0 50px; width: 50px; height: 50px; border-radius: 50%; padding: 2.5px; box-sizing: border-box; background: {{t.ring}}; box-shadow: {{t.ringGlow}}">
+<span style="width: 100%; height: 100%; border-radius: 50%; background: {{t.avatarBg}}; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; color: {{t.initials}}; letter-spacing: 0.03em">{{initials}}</span>
+<span style="position: absolute; right: -1px; bottom: -1px; width: 13px; height: 13px; border-radius: 50%; background: #22c55e; border: 2.5px solid {{t.sideSolid}}" aria-hidden="true"></span>
+</span>
+<sc-if value="{{showLabels}}" hint-placeholder-val="{{ true }}">
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{name}}</span>
+<span style="align-self: flex-start; font-size: 9.5px; font-weight: 700; letter-spacing: 0.16em; padding: 3px 8px; border-radius: 999px; color: {{t.onAccent}}; background: {{t.badge}}">STUDIO OWNER</span>
+</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{t.muted}}" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" style="flex: 0 0 16px"><path d="M7 14l5-5 5 5"></path></svg>
+</sc-if>
+</button>
+
+<sc-if value="{{profileOpen}}" hint-placeholder-val="{{ false }}">
+<div role="dialog" aria-label="Profile" class="as-raise" style="position: absolute; left: 0; bottom: 84px; z-index: 30; width: 290px; border-radius: 24px; background: {{t.panelSolid}}; border: 1px solid {{t.goldLine}}; overflow: hidden">
+<div style="padding: 22px 20px 18px; display: flex; align-items: center; gap: 14px; background: {{t.profileHead}}; border-bottom: 1px solid {{t.goldLine}}">
+<span style="flex: 0 0 66px; width: 66px; height: 66px; border-radius: 50%; padding: 3px; box-sizing: border-box; background: {{t.ring}}; box-shadow: {{t.ringGlow}}">
+<span style="width: 100%; height: 100%; border-radius: 50%; background: {{t.avatarBg}}; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: {{t.initials}}">{{initials}}</span>
+</span>
+<span style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+<span style="font-size: 18px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{name}}</span>
+<span style="font-size: 12px; color: {{t.muted}}">Local profile · this PC</span>
+</span>
+</div>
+<div style="padding: 16px 16px 12px; display: flex; flex-direction: column; gap: 12px">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: {{t.muted}}">Display name
+<input class="as-in as-sink" type="text" value="{{name}}" onChange="{{onName}}" maxlength="24" style="min-height: 44px; border-radius: 14px; border: 1px solid {{t.inputBorder}}; background: {{t.inset}}; color: {{t.text}}; padding: 0 14px; font-family: inherit; font-size: 14px"></label>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<button class="as-btn" style="min-height: 64px; border-radius: 16px; border: 0; cursor: pointer; background: {{t.panelSolid}}; color: {{t.text}}; font-family: inherit; font-size: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{t.accentText}}" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>Change photo</button>
+<button class="as-btn" onClick="{{goHomeClose}}" style="min-height: 64px; border-radius: 16px; border: 0; cursor: pointer; background: {{t.panelSolid}}; color: {{t.text}}; font-family: inherit; font-size: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{t.accentText}}" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="7" height="7" rx="1.5"></rect><rect x="14" y="4" width="7" height="7" rx="1.5"></rect><rect x="3" y="15" width="7" height="6" rx="1.5"></rect><rect x="14" y="15" width="7" height="6" rx="1.5"></rect></svg>My Library</button>
+<button class="as-btn" style="min-height: 64px; border-radius: 16px; border: 0; cursor: pointer; background: {{t.panelSolid}}; color: {{t.text}}; font-family: inherit; font-size: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{t.accentText}}" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"></path></svg>Backup</button>
+<button class="as-btn" style="min-height: 64px; border-radius: 16px; border: 0; cursor: pointer; background: {{t.panelSolid}}; color: {{t.text}}; font-family: inherit; font-size: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{t.accentText}}" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"></path></svg>Shortcuts</button>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 4px 2px; font-size: 11px; color: {{t.muted}}"><span>MotionForge Lite · [VERSION]</span><button class="as-btn" onClick="{{closeProfile}}" style="min-height: 34px; padding: 0 12px; border-radius: 10px; border: 0; cursor: pointer; background: {{t.panelSolid}}; color: {{t.text}}; font-family: inherit; font-size: 12px">Done</button></div>
+</div>
+</div>
+</sc-if>
+</div>
+</nav>
+
+<div style="flex: 999 1 600px; min-width: 0; display: flex; flex-direction: column">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 16px 22px; border-bottom: 1px solid {{t.border}}">
+<button class="as-btn" onClick="{{toggleSide}}" aria-label="Collapse or expand menu" style="width: 46px; height: 46px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: {{t.text}}; display: flex; align-items: center; justify-content: center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h16"></path></svg>
+</button>
+<div style="display: flex; flex-direction: column; margin-right: auto">
+<span style="font-size: 12px; color: {{t.muted}}">MotionForge Lite</span>
+<span style="font-size: 18px; font-weight: 600">{{pageTitle}}</span>
+</div>
+<button class="as-btn {{obs.cls}}" onClick="{{toggleLive}}" aria-label="OBS status" style="min-height: 46px; display: flex; align-items: center; gap: 10px; padding: 0 18px; border-radius: 999px; border: 0; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; background: {{t.panel}}; color: {{obs.fg}}">
+<span class="{{obs.dotClass}}" style="width: 10px; height: 10px; border-radius: 50%; background: {{obs.dot}}" aria-hidden="true"></span>{{obs.label}}
+</button>
+<div role="group" aria-label="Language" class="as-sink" style="display: flex; gap: 6px; padding: 5px; border-radius: 999px; background: {{t.inset}}">
+<button class="as-btn as-on" style="min-height: 38px; padding: 0 14px; border-radius: 999px; border: 0; cursor: pointer; background: {{t.accent}}; color: {{t.onAccent}}; font-family: inherit; font-size: 12px; font-weight: 600">EN</button>
+<button class="as-btn" style="min-height: 38px; padding: 0 14px; border-radius: 999px; border: 0; cursor: pointer; background: {{t.panel}}; color: {{t.muted}}; font-family: 'Hind Siliguri', inherit; font-size: 13px">বাংলা</button>
+</div>
+<button class="as-btn" onClick="{{toggleTheme}}" aria-label="Switch light or dark mode" style="width: 46px; height: 46px; border-radius: 50%; border: 0; cursor: pointer; background: {{t.panel}}; color: {{t.text}}; display: flex; align-items: center; justify-content: center">
+<sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+<sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></sc-if>
+</button>
+<div style="position: relative">
+<button class="as-btn {{powerCls}}" onClick="{{togglePower}}" aria-label="Power: restart or quit" aria-expanded="{{powerOpen}}" style="width: 46px; height: 46px; border-radius: 50%; border: 0; cursor: pointer; background: {{t.panel}}; color: #f87171; display: flex; align-items: center; justify-content: center">
+<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v9"></path><path d="M6.3 7.3a8 8 0 1 0 11.4 0"></path></svg>
+</button>
+<sc-if value="{{powerOpen}}" hint-placeholder-val="{{ false }}">
+<div role="menu" aria-label="Power" class="as-raise" style="position: absolute; right: 0; top: 58px; z-index: 20; width: 220px; border-radius: 18px; background: {{t.panelSolid}}; border: 1px solid {{t.border}}; padding: 10px; display: flex; flex-direction: column; gap: 8px">
+<button role="menuitem" class="as-btn" onClick="{{closePower}}" style="min-height: 46px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-radius: 12px; border: 0; cursor: pointer; background: {{t.panelSolid}}; color: {{t.text}}; font-family: inherit; font-size: 13px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"></path><path d="M21 3v6h-6"></path></svg>Restart app</button>
+<button role="menuitem" class="as-btn" onClick="{{closePower}}" style="min-height: 46px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-radius: 12px; border: 0; cursor: pointer; background: #dc2626; color: #ffffff; font-family: inherit; font-size: 13px; font-weight: 600">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v9"></path><path d="M6.3 7.3a8 8 0 1 0 11.4 0"></path></svg>Quit app</button>
+<span style="font-size: 11px; line-height: 1.4; color: {{t.muted}}; padding: 2px 4px">Unsaved work is saved first. OBS keeps running.</span>
+</div>
+</sc-if>
+</div>
+</header>
+
+<div style="flex: 1; display: flex; flex-wrap: wrap; min-height: 0">
+
+<main style="flex: 999 1 480px; min-width: 0; box-sizing: border-box; padding: 26px; display: flex; flex-direction: column; gap: 24px">
+
+<sc-if value="{{isHome}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 30px; font-weight: 700">Hello, {{name}}</h1>
+<span style="font-size: 14px; color: {{t.muted}}">Here is where you left off.</span>
+</div>
+
+<section class="as-raise" style="border-radius: 26px; background: {{t.panel}}; border: 1px solid {{t.cardBorder}}; padding: 22px; display: flex; flex-wrap: wrap; gap: 24px; align-items: center; backdrop-filter: {{t.blur}}">
+<div class="as-sink" style="flex: 0 0 150px; height: 170px; border-radius: 18px; background: {{t.inset}}; display: flex; align-items: center; justify-content: center">
+<div style="width: 104px; height: 136px; background: #fbfaf6; border-radius: 4px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); padding: 14px 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px">
+<span style="height: 7px; width: 60%; background: #d9d6cc; border-radius: 2px"></span>
+<span style="height: 5px; width: 90%; background: #c9b8ff; border-radius: 2px"></span>
+<span style="height: 5px; width: 80%; background: #e5e2d9; border-radius: 2px"></span>
+<span style="height: 5px; width: 85%; background: #e5e2d9; border-radius: 2px"></span>
+<span style="margin-top: auto; height: 34px; width: 100%; background: #ece9e0; border-radius: 2px"></span>
+</div>
+</div>
+<div style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; color: {{t.accentText}}">CONTINUE EDITING</span>
+<span style="font-size: 24px; font-weight: 700">nff (7)</span>
+<span style="font-size: 13px; color: {{t.muted}}">Document Editor · Slot 1 · All changes saved</span>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px">
+<button class="as-btn" onClick="{{goDoc}}" style="min-height: 48px; padding: 0 22px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.accent}}; color: {{t.onAccent}}; font-family: inherit; font-weight: 600; font-size: 14px">Resume</button>
+<button class="as-btn" onClick="{{goCam}}" style="min-height: 48px; padding: 0 22px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: {{t.text}}; font-family: inherit; font-size: 14px">Send to Output</button>
+</div>
+</div>
+</section>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px">
+<section class="as-raise" style="border-radius: 26px; background: {{t.panel}}; border: 1px solid {{t.cardBorder}}; padding: 20px; display: flex; flex-direction: column; gap: 12px; backdrop-filter: {{t.blur}}">
+<div style="display: flex; justify-content: space-between; align-items: center"><h2 style="margin: 0; font-size: 16px; font-weight: 600">Live Output</h2><span style="font-size: 12px; font-weight: 600; color: {{obs.fg}}">{{obs.short}}</span></div>
+<div class="as-sink" style="border-radius: 16px; padding: 8px; background: {{t.inset}}">
+<div style="position: relative; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: {{camBg}}; display: flex; align-items: center; justify-content: center">
+<svg width="60" height="70" viewBox="0 0 170 200" aria-hidden="true"><circle cx="85" cy="70" r="42" fill="#c9c4d8"></circle><path d="M18 196c0-42 30-68 67-68s67 26 67 68z" fill="#c9c4d8"></path></svg>
+<span style="position: absolute; left: 8px; bottom: 8px; font-size: 11px; padding: 4px 8px; border-radius: 999px; background: rgba(0,0,0,0.6); color: #ffffff">{{camSource}} · 720p</span>
+</div>
+</div>
+<span style="font-size: 12px; color: {{t.muted}}">What OBS sees right now.</span>
+</section>
+<section class="as-raise" style="border-radius: 26px; background: {{t.panel}}; border: 1px solid {{t.cardBorder}}; padding: 20px; display: flex; flex-direction: column; gap: 12px; backdrop-filter: {{t.blur}}">
+<div style="display: flex; justify-content: space-between; align-items: center"><h2 style="margin: 0; font-size: 16px; font-weight: 600">Getting Started</h2><span style="font-size: 12px; color: {{t.muted}}">{{steps.done}} of 3</span></div>
+<div class="as-sink" style="height: 10px; border-radius: 999px; background: {{t.inset}}; overflow: hidden"><div style="height: 100%; width: {{steps.width}}; background: {{t.accent}}; border-radius: 999px"></div></div>
+<div style="display: flex; align-items: center; gap: 12px; font-size: 13px"><span style="width: 26px; height: 26px; border-radius: 50%; background: {{t.accent}}; color: {{t.onAccent}}; display: flex; align-items: center; justify-content: center; font-size: 13px">✓</span>Edit your first document</div>
+<div style="display: flex; align-items: center; gap: 12px; font-size: 13px; color: {{t.muted}}"><span class="as-sink" style="width: 26px; height: 26px; border-radius: 50%; background: {{t.inset}}"></span>Create a character</div>
+<div style="display: flex; align-items: center; gap: 12px; font-size: 13px; color: {{steps.obsColor}}"><span style="width: 26px; height: 26px; border-radius: 50%; background: {{steps.obsBg}}; color: {{t.onAccent}}; display: flex; align-items: center; justify-content: center; font-size: 13px">{{steps.obsMark}}</span>Go live in OBS</div>
+</section>
+</div>
+
+<section style="display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Library</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 18px">
+<button class="as-btn" onClick="{{goDoc}}" style="min-height: 120px; border-radius: 20px; border: 0; cursor: pointer; background: {{t.panel}}; color: inherit; font-family: inherit; padding: 14px; display: flex; flex-direction: column; gap: 10px; text-align: left">
+<span class="as-sink" style="height: 60px; border-radius: 12px; background: {{t.inset}}; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{{t.purple}}" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="9" cy="9" r="2"></circle><path d="M21 15l-5-5L5 21"></path></svg></span>
+<span style="font-size: 13px; font-weight: 600">nff (7)</span>
+</button>
+<button class="as-btn" onClick="{{goDoc}}" style="min-height: 120px; border-radius: 20px; border: 0; cursor: pointer; background: {{t.panel}}; color: inherit; font-family: inherit; padding: 14px; display: flex; flex-direction: column; gap: 10px; text-align: left">
+<span class="as-sink" style="height: 60px; border-radius: 12px; background: {{t.inset}}; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{{t.pink}}" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="9" cy="9" r="2"></circle><path d="M21 15l-5-5L5 21"></path></svg></span>
+<span style="font-size: 13px; font-weight: 600">My pic</span>
+</button>
+<button class="as-btn" onClick="{{goHuman}}" style="min-height: 120px; border-radius: 20px; border: 0; cursor: pointer; background: {{t.panel}}; color: {{t.muted}}; font-family: inherit; padding: 14px; display: flex; flex-direction: column; gap: 10px; text-align: left">
+<span class="as-sink" style="height: 60px; border-radius: 12px; background: {{t.inset}}; display: flex; align-items: center; justify-content: center; font-size: 26px">+</span>
+<span style="font-size: 13px">No characters yet</span>
+</button>
+</div>
+</section>
+</div>
+</sc-if>
+
+<sc-if value="{{isHuman}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 18px; flex: 1">
+<div class="as-sink" style="flex: 1; min-height: 480px; border-radius: 26px; background: {{t.inset}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; position: relative">
+<span class="as-raise" style="position: absolute; top: 16px; left: 16px; font-size: 12px; padding: 7px 13px; border-radius: 999px; background: {{t.panel}}; color: {{t.muted}}">Preview · 720p</span>
+<svg width="170" height="200" viewBox="0 0 170 200" aria-hidden="true"><circle cx="85" cy="70" r="42" fill="none" stroke="{{t.muted}}" stroke-width="3" stroke-dasharray="6 7"></circle><path d="M18 196c0-42 30-68 67-68s67 26 67 68" fill="none" stroke="{{t.muted}}" stroke-width="3" stroke-dasharray="6 7"></path></svg>
+<span style="font-size: 18px; font-weight: 600">No character yet</span>
+<span style="font-size: 13px; color: {{t.muted}}">Upload a face photo or describe one in the right panel.</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<span class="as-raise" style="font-size: 12px; padding: 9px 15px; border-radius: 999px; background: {{t.panel}}">Saved characters: 0</span>
+<span class="as-raise" style="font-size: 12px; padding: 9px 15px; border-radius: 999px; background: {{t.panel}}">Head turn limit: ±20°</span>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isDoc}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 18px; flex: 1">
+<div role="tablist" aria-label="Open documents" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+<button role="tab" aria-selected="true" class="as-btn as-on" style="min-height: 46px; padding: 0 18px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: {{t.accentText}}; font-family: inherit; font-size: 13px; font-weight: 600">nff (7)</button>
+<button role="tab" aria-selected="false" class="as-btn" style="min-height: 46px; padding: 0 18px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: {{t.muted}}; font-family: inherit; font-size: 13px">+ Open document</button>
+<button role="tab" aria-selected="false" class="as-btn" style="min-height: 46px; padding: 0 18px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: {{t.muted}}; font-family: inherit; font-size: 13px">+ Open document</button>
+<span style="margin-left: auto; font-size: 12px; color: {{t.muted}}">1 / 3 open · All changes saved</span>
+</div>
+<div class="as-sink" style="flex: 1; min-height: 480px; border-radius: 26px; background: {{t.inset}}; display: flex; align-items: center; justify-content: center; padding: 24px">
+<div style="width: 320px; height: 430px; background: #fbfaf6; border-radius: 6px; box-shadow: 0 24px 44px rgba(0,0,0,0.4); padding: 34px 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px">
+<span style="height: 16px; width: 60%; background: #d9d6cc; border-radius: 3px"></span>
+<span style="position: relative; height: 12px; width: 90%; background: #e5e2d9; border-radius: 3px"><span style="position: absolute; inset: -8px -6px; border: 2px solid #8b5cf6; border-radius: 4px; background: rgba(139,92,246,0.08)"></span></span>
+<span style="height: 12px; width: 80%; background: #e5e2d9; border-radius: 3px; outline: 1px solid #38bdf8; outline-offset: 6px"></span>
+<span style="height: 12px; width: 85%; background: #e5e2d9; border-radius: 3px; outline: 1px solid #38bdf8; outline-offset: 6px"></span>
+<span style="height: 12px; width: 55%; background: #e5e2d9; border-radius: 3px; outline: 2px dashed #eab308; outline-offset: 6px"></span>
+<span style="margin-top: auto; height: 90px; width: 100%; background: #ece9e0; border-radius: 4px"></span>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isCam}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 18px; flex: 1">
+<div class="as-sink" style="border-radius: 26px; padding: 16px; background: {{t.inset}}">
+<div style="position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: {{camBg}}; display: flex; align-items: center; justify-content: center; box-shadow: 0 18px 36px rgba(0,0,0,0.3)">
+<svg width="140" height="160" viewBox="0 0 170 200" aria-hidden="true"><circle cx="85" cy="70" r="42" fill="#c9c4d8"></circle><path d="M18 196c0-42 30-68 67-68s67 26 67 68z" fill="#c9c4d8"></path></svg>
+<span style="position: absolute; top: 12px; left: 12px; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 999px; background: rgba(0,0,0,0.6); color: #ffffff">Source: {{camSource}}</span>
+<sc-if value="{{obsLive}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; top: 12px; right: 12px; font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px; background: #16a34a; color: #ffffff">● LIVE</span></sc-if>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<span class="as-raise" style="font-size: 12px; padding: 9px 15px; border-radius: 999px; background: {{t.panel}}">1280 × 720 · 24 FPS</span>
+<span class="as-raise" style="font-size: 12px; padding: 9px 15px; border-radius: 999px; background: {{t.panel}}">Background: {{camBgLabel}}</span>
+</div>
+</div>
+</sc-if>
+</main>
+
+<aside aria-label="Controls" style="flex: 1 1 280px; max-width: 340px; box-sizing: border-box; background: {{t.right}}; border-left: 1px solid {{t.border}}; padding: 24px 22px; display: flex; flex-direction: column; gap: 18px; backdrop-filter: {{t.blur}}">
+
+<sc-if value="{{isHome}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 18px">
+<h2 style="margin: 0; font-size: 17px; font-weight: 600">Overview</h2>
+<div style="display: flex; align-items: center; gap: 14px"><span class="as-raise" style="width: 46px; height: 46px; border-radius: 50%; background: {{t.panel}}; display: flex; align-items: center; justify-content: center; font-weight: 700; color: {{t.purple}}">2</span><span style="font-size: 13px; color: {{t.muted}}">Saved documents</span></div>
+<div style="display: flex; align-items: center; gap: 14px"><span class="as-raise" style="width: 46px; height: 46px; border-radius: 50%; background: {{t.panel}}; display: flex; align-items: center; justify-content: center; font-weight: 700; color: {{t.pink}}">0</span><span style="font-size: 13px; color: {{t.muted}}">Saved characters</span></div>
+<div style="display: flex; align-items: center; gap: 14px"><span class="as-raise" style="width: 46px; height: 46px; border-radius: 50%; background: {{t.panel}}; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: {{t.teal}}">1/3</span><span style="font-size: 13px; color: {{t.muted}}">Editor slots in use</span></div>
+<div class="as-raise" style="border-radius: 22px; padding: 18px; background: {{t.feature}}; color: #ffffff; display: flex; flex-direction: column; gap: 10px; margin-top: 6px">
+<span style="font-size: 16px; font-weight: 700">Back up your work</span>
+<span style="font-size: 13px; line-height: 1.5; color: #e4dcff">All documents and characters in one file. Restore on any PC.</span>
+<button class="as-btn" style="min-height: 46px; border-radius: 999px; border: 0; cursor: pointer; background: #ffffff; color: #2a0f8c; font-family: inherit; font-weight: 700; font-size: 13px">Back up now</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isHuman}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-size: 17px; font-weight: 600">Character</h2>
+<div style="display: flex; gap: 12px">
+<button class="as-btn" style="flex: 1; min-height: 46px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.accent}}; color: {{t.onAccent}}; font-family: inherit; font-weight: 600; font-size: 13px">Upload photo</button>
+<button class="as-btn" style="flex: 1; min-height: 46px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: inherit; font-family: inherit; font-size: 13px">Generate</button>
+</div>
+<h2 style="margin: 4px 0 0; font-size: 15px; font-weight: 600">Pose &amp; Expression</h2>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: {{t.muted}}">Head turn (left / right)<input class="as-range as-in" type="range" min="-20" max="20" value="0"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: {{t.muted}}">Head tilt (up / down)<input class="as-range as-in" type="range" min="-20" max="20" value="0"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: {{t.muted}}">Eyes (open / closed)<input class="as-range as-in" type="range" min="0" max="100" value="0"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: {{t.muted}}">Smile<input class="as-range as-in" type="range" min="0" max="100" value="20"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: {{t.muted}}">Zoom<input class="as-range as-in" type="range" min="50" max="150" value="100"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: {{t.muted}}">Text command
+<input class="as-in as-sink" type="text" placeholder="e.g. smile and look left" style="min-height: 46px; border-radius: 14px; border: 1px solid {{t.inputBorder}}; background: {{t.inset}}; color: {{t.text}}; padding: 0 14px; font-family: inherit; font-size: 13px"></label>
+<button class="as-btn" style="min-height: 46px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.accent}}; color: {{t.onAccent}}; font-family: inherit; font-weight: 600; font-size: 13px">Save character</button>
+</div>
+</sc-if>
+
+<sc-if value="{{isDoc}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-size: 17px; font-weight: 600">Edit Text</h2>
+<span style="font-size: 12px; color: {{t.muted}}">5 lines found · 1 uncertain (yellow)</span>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: {{t.muted}}">Detected: [ORIGINAL LINE]
+<textarea class="as-in as-sink" rows="3" style="border-radius: 14px; border: 1px solid {{t.inputBorder}}; background: {{t.inset}}; color: {{t.text}}; padding: 12px 14px; font-family: inherit; font-size: 13px; resize: vertical">[NEW TEXT]</textarea></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: {{t.muted}}">Font
+<select class="as-in as-sink" style="min-height: 46px; border-radius: 14px; border: 1px solid {{t.inputBorder}}; background: {{t.inset}}; color: {{t.text}}; padding: 0 12px; font-family: inherit; font-size: 13px"><option>Noto Sans Bengali</option><option>Hind Siliguri</option><option>Noto Serif Bengali</option></select></label>
+<span style="font-size: 12px; color: {{t.muted}}">Size, position and colour match the original automatically.</span>
+<button class="as-btn" style="min-height: 48px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.accent}}; color: {{t.onAccent}}; font-family: inherit; font-weight: 600; font-size: 14px">Apply</button>
+<h2 style="margin: 6px 0 0; font-size: 15px; font-weight: 600">Replace Image</h2>
+<button class="as-btn" style="min-height: 46px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: inherit; font-family: inherit; font-size: 13px">Select area</button>
+<div style="display: flex; gap: 12px">
+<button class="as-btn" style="flex: 1; min-height: 46px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: inherit; font-family: inherit; font-size: 13px">Undo</button>
+<button class="as-btn" style="flex: 1; min-height: 46px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: inherit; font-family: inherit; font-size: 13px">Redo</button>
+<button class="as-btn" style="flex: 1; min-height: 46px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: inherit; font-family: inherit; font-size: 13px">Export</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isCam}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-size: 17px; font-weight: 600">Output</h2>
+<span style="font-size: 12px; color: {{t.muted}}">Source</span>
+<div style="display: flex; gap: 12px">
+<button class="as-btn {{src.humanCls}}" onClick="{{srcHuman}}" style="flex: 1; min-height: 46px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: {{src.humanFg}}; font-family: inherit; font-size: 13px; font-weight: 600">Human</button>
+<button class="as-btn {{src.docCls}}" onClick="{{srcDoc}}" style="flex: 1; min-height: 46px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: {{src.docFg}}; font-family: inherit; font-size: 13px; font-weight: 600">Document</button>
+</div>
+<span style="font-size: 12px; color: {{t.muted}}">Background</span>
+<div style="display: flex; gap: 10px">
+<button class="as-btn {{bgs.origCls}}" onClick="{{bgOriginal}}" style="flex: 1; min-height: 46px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: {{bgs.origFg}}; font-family: inherit; font-size: 12px; font-weight: 600">Original</button>
+<button class="as-btn {{bgs.greenCls}}" onClick="{{bgGreen}}" style="flex: 1; min-height: 46px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: {{bgs.greenFg}}; font-family: inherit; font-size: 12px; font-weight: 600">Green</button>
+<button class="as-btn {{bgs.customCls}}" onClick="{{bgCustom}}" style="flex: 1; min-height: 46px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: {{bgs.customFg}}; font-family: inherit; font-size: 12px; font-weight: 600">Custom</button>
+</div>
+<button class="as-btn" style="min-height: 46px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: inherit; font-family: inherit; font-size: 13px">Open output window</button>
+<button class="as-btn" style="min-height: 46px; border-radius: 14px; border: 0; cursor: pointer; background: {{t.panel}}; color: inherit; font-family: inherit; font-size: 13px">Launch OBS</button>
+<button class="as-btn" onClick="{{toggleLive}}" style="min-height: 52px; border-radius: 14px; border: 0; cursor: pointer; background: {{liveBtn.bg}}; color: #ffffff; font-family: inherit; font-weight: 700; font-size: 14px">{{liveBtn.label}}</button>
+</div>
+</sc-if>
+
+</aside>
+</div>
+</div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { view: 'home', collapsed: false, theme: 'dark', obsLive: false, src: 'human', bg: 'original', powerOpen: false, profileOpen: false, name: 'Creator' };
+}
+renderVals() {
+const s = this.state;
+const dark = s.theme === 'dark';
+const t = dark ? {
+page: '#17181c', shell: '#25272c', shellBorder: '#2c2f34', shellShadow: '0 30px 60px rgba(0,0,0,0.5)', blur: 'none',
+side: '#25272c', sideSolid: '#25272c', right: '#25272c', panel: '#25272c', inset: '#1f2125', border: '#2f3238', cardBorder: 'transparent',
+text: '#e8e9ec', muted: '#a6aab2', accent: '#5eead4', onAccent: '#0f2a25', accentText: '#5eead4',
+inputBorder: '#8a8a8a', pink: '#f17a98', purple: '#c084fc', teal: '#5eead4', feature: '#3b2a7a', panelSolid: '#25272c',
+goldLine: 'rgba(94,234,212,0.30)', profileBg: 'linear-gradient(145deg, #2b2d33, #222428)', avatarBg: '#1a1b1f', profileHead: 'linear-gradient(135deg, rgba(94,234,212,0.14), rgba(94,234,212,0) 70%)',
+ring: 'conic-gradient(from 210deg, #5eead4, #0f766e, #ccfbf1, #2dd4bf, #5eead4)', ringGlow: '0 0 20px rgba(94,234,212,0.35)', initials: '#5eead4', badge: 'linear-gradient(135deg, #99f6e4, #2dd4bf)'
+} : {
+page: 'radial-gradient(circle at 15% 10%, #f6d9ff 0%, rgba(246,217,255,0) 40%), radial-gradient(circle at 85% 85%, #d4ccff 0%, rgba(212,204,255,0) 45%), #ece8fb',
+shell: 'rgba(255,255,255,0.35)', shellBorder: 'rgba(255,255,255,0.8)', shellShadow: '0 30px 70px rgba(91,43,224,0.18)', blur: 'blur(18px)',
+side: 'rgba(255,255,255,0.72)', sideSolid: '#ffffff', right: 'rgba(255,255,255,0.55)', panel: 'rgba(255,255,255,0.85)', inset: 'rgba(255,255,255,0.6)', border: 'rgba(109,61,245,0.14)', cardBorder: 'rgba(255,255,255,0.9)',
+text: '#1c1638', muted: '#5f5980', accent: '#6d3df5', onAccent: '#ffffff', accentText: '#5b2be0',
+inputBorder: '#8f86b8', pink: '#c0267a', purple: '#6d3df5', teal: '#0e7c86', panelSolid: '#ffffff',
+goldLine: 'rgba(109,61,245,0.30)', profileBg: 'linear-gradient(145deg, rgba(255,255,255,0.95), rgba(246,240,255,0.85))', avatarBg: '#ffffff', profileHead: 'linear-gradient(135deg, rgba(109,61,245,0.14), rgba(193,58,240,0.06) 60%, rgba(255,255,255,0) 90%)',
+ring: 'conic-gradient(from 210deg, #6d3df5, #c13af0, #b9a3ff, #4b1fd1, #6d3df5)', ringGlow: '0 0 22px rgba(109,61,245,0.35)', initials: '#5b2be0', badge: 'linear-gradient(135deg, #6d3df5, #a43ae8)',
+feature: 'radial-gradient(circle at 80% 20%, #c13af0 0%, rgba(193,58,240,0) 50%), #2a0f8c'
+};
+const item = (key) => {
+const on = s.view === key;
+if (dark) return { cls: on ? 'as-on' : '', bg: t.panel, fg: on ? t.accent : t.muted };
+return { cls: on ? 'as-on' : '', bg: on ? '#6d3df5' : 'rgba(255,255,255,0.7)', fg: on ? '#ffffff' : t.muted };
+};
+const titles = { home: 'Home', human: 'Human Studio', doc: 'Document Editor', cam: 'Webcam Output' };
+const live = s.obsLive;
+const pick = (on) => ({ cls: on ? 'as-on' : '', fg: on ? t.accentText : t.muted });
+const sh = pick(s.src === 'human'), sd = pick(s.src === 'doc');
+const bo = pick(s.bg === 'original'), bgr = pick(s.bg === 'green'), bc = pick(s.bg === 'custom');
+const camBgMap = { original: '#ffffff', green: '#00b140', custom: 'linear-gradient(135deg, #1e3a8a, #9333ea)' };
+const camBgLabel = { original: 'Original (white)', green: 'Green Screen', custom: 'Custom image' };
+const liveFg = dark ? '#86efac' : '#15803d';
+return {
+t,
+themeClass: dark ? 'as-dark' : 'as-light',
+isDark: dark, isLight: !dark,
+showLabels: !s.collapsed,
+sideW: s.collapsed ? '88px' : '244px',
+nav: { home: item('home'), human: item('human'), doc: item('doc'), cam: item('cam'), set: item('settings') },
+powerOpen: s.powerOpen,
+profileOpen: s.profileOpen,
+profileCls: s.profileOpen ? 'as-on' : '',
+profileJustify: s.collapsed ? 'center' : 'flex-start',
+name: s.name || 'Creator',
+initials: ((s.name || 'Creator').trim().split(/\s+/).map((w) => w.charAt(0)).join('').slice(0, 2) || 'C').toUpperCase(),
+onName: (e) => this.setState({ name: e.target.value }),
+toggleProfile: () => this.setState({ profileOpen: !s.profileOpen, powerOpen: false }),
+closeProfile: () => this.setState({ profileOpen: false }),
+goHomeClose: () => this.setState({ profileOpen: false, view: 'home' }),
+powerCls: s.powerOpen ? 'as-on' : '',
+togglePower: () => this.setState({ powerOpen: !s.powerOpen }),
+closePower: () => this.setState({ powerOpen: false }),
+pageTitle: titles[s.view],
+isHome: s.view === 'home', isHuman: s.view === 'human', isDoc: s.view === 'doc', isCam: s.view === 'cam',
+obsLive: live,
+obs: live
+? { cls: 'as-on', fg: liveFg, dot: '#22c55e', dotClass: 'as-live', label: 'OBS · LIVE', short: '● LIVE' }
+: { cls: '', fg: t.muted, dot: '#8a8f98', dotClass: '', label: 'OBS · Offline', short: 'Offline' },
+liveBtn: live ? { bg: '#dc2626', label: 'Stop Live' } : { bg: '#16a34a', label: 'Go Live in OBS' },
+steps: live
+? { done: 2, width: '66%', obsBg: t.accent, obsColor: t.text, obsMark: '✓' }
+: { done: 1, width: '33%', obsBg: 'transparent', obsColor: t.muted, obsMark: '' },
+src: { humanCls: sh.cls, humanFg: sh.fg, docCls: sd.cls, docFg: sd.fg },
+bgs: { origCls: bo.cls, origFg: bo.fg, greenCls: bgr.cls, greenFg: bgr.fg, customCls: bc.cls, customFg: bc.fg },
+camBg: camBgMap[s.bg], camBgLabel: camBgLabel[s.bg], camSource: s.src === 'human' ? 'Human' : 'Document',
+goHome: () => this.setState({ view: 'home' }),
+goHuman: () => this.setState({ view: 'human' }),
+goDoc: () => this.setState({ view: 'doc' }),
+goCam: () => this.setState({ view: 'cam' }),
+toggleSide: () => this.setState({ collapsed: !s.collapsed }),
+toggleTheme: () => this.setState({ theme: dark ? 'light' : 'dark' }),
+toggleLive: () => this.setState({ obsLive: !live }),
+srcHuman: () => this.setState({ src: 'human' }),
+srcDoc: () => this.setState({ src: 'doc' }),
+bgOriginal: () => this.setState({ bg: 'original' }),
+bgGreen: () => this.setState({ bg: 'green' }),
+bgCustom: () => this.setState({ bg: 'custom' })
+};
+}
+}
+</script>
+</body>
+</html>

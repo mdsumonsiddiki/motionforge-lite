@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import type { Settings } from '../../electron/shared/settings'
+import { defaultSettings, type Settings } from '../../electron/shared/settings'
 import { setSettingsBackend, useSettingsStore } from './settingsStore'
 import { useToastStore } from './toastStore'
 
-const saved: Settings = { language: 'en', theme: 'dark', obsPath: 'C:\\obs.exe' }
+const saved: Settings = defaultSettings('C:\\obs.exe')
 
 describe('settingsStore', () => {
   let disk: Settings
@@ -59,7 +59,8 @@ describe('settingsStore', () => {
     expect(useSettingsStore.getState().settings).toEqual({
       language: 'en',
       theme: 'dark',
-      obsPath: ''
+      obsPath: '',
+      reduceEffects: false
     })
     expect(useToastStore.getState().toasts[0]?.messageKey).toBe('errors.settingsLoad')
   })

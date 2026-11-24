@@ -136,6 +136,7 @@ userData/
 - Logo: ছোট Custom Icon আর পাশে "MotionForge Lite" লেখা।
 - Notification শুধু দুই রকম: Generation Complete আর Error।
 - App Close করার আগে Confirmation চাইবে।
+- **User-এর সিদ্ধান্ত (2026-11-25): নতুন UI** — `docs/UI_REDESIGN.md` আর `docs/ui-reference/AppShell.reference.html` অনুযায়ী (Dark 3D + Light Glass)। এটা ওপরের Layout নিয়মগুলো বদলায়: বামে Sidebar, মাঝে Workspace (Preview), ডানে Control Panel; Dashboard-এর বদলে Home Section (Library-তে ছোট Card); Local Profile, Power Menu (Restart / Quit), Settings → Reduce effects। যে Feature এখনো তৈরি হয়নি তা Disabled + "Coming soon"।
 
 ---
 

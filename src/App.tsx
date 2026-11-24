@@ -37,9 +37,16 @@ export default function App() {
   // Apply theme and language as soon as they change.
   const theme = settings?.theme ?? 'dark'
   const language = settings?.language ?? 'en'
+  const reduceEffects = settings?.reduceEffects ?? false
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark')
+    const root = document.documentElement
+    root.classList.toggle('dark', theme === 'dark')
+    // Theme tokens + depth classes (src/styles/tokens.css).
+    root.dataset.theme = theme
   }, [theme])
+  useEffect(() => {
+    document.documentElement.dataset.reduceEffects = String(reduceEffects)
+  }, [reduceEffects])
   useEffect(() => {
     void i18n.changeLanguage(language)
     document.documentElement.lang = language

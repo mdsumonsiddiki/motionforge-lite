@@ -1,0 +1,245 @@
+/*
+ * UI theme tokens and depth classes (docs/UI_REDESIGN.md sections 2 and 3).
+ * Values are copied exactly from docs/ui-reference/AppShell.reference.html.
+ * The theme is chosen by `data-theme` on <html> (set from Settings → Theme).
+ * Checked by src/styles/tokens.test.ts (contrast in both themes).
+ */
+
+:root,
+[data-theme='dark'] {
+  --page: #17181c;
+  --shell: #25272c;
+  --shell-border: #2c2f34;
+  --shell-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+  --blur: none;
+  --side: #25272c;
+  --side-solid: #25272c;
+  --right: #25272c;
+  --panel: #25272c;
+  --panel-solid: #25272c;
+  --inset: #1f2125;
+  --border: #2f3238;
+  --card-border: transparent;
+  --text: #e8e9ec;
+  --muted: #a6aab2;
+  --accent: #5eead4;
+  --on-accent: #0f2a25;
+  --accent-text: #5eead4;
+  --input-border: #8a8a8a;
+  --pink: #f17a98;
+  --purple: #c084fc;
+  --teal: #5eead4;
+  --feature: #3b2a7a;
+  --ring: conic-gradient(from 210deg, #5eead4, #0f766e, #ccfbf1, #2dd4bf, #5eead4);
+  --ring-glow: 0 0 20px rgba(94, 234, 212, 0.35);
+  --initials: #5eead4;
+  --badge: linear-gradient(135deg, #99f6e4, #2dd4bf);
+  --accent-line: rgba(94, 234, 212, 0.3);
+  --profile-bg: linear-gradient(145deg, #2b2d33, #222428);
+  --avatar-bg: #1a1b1f;
+  --profile-head: linear-gradient(135deg, rgba(94, 234, 212, 0.14), rgba(94, 234, 212, 0) 70%);
+  /* Sidebar items: dark = sunken + accent text when selected. */
+  --nav-bg: #25272c;
+  --nav-bg-on: #25272c;
+  --nav-fg: #a6aab2;
+  --nav-fg-on: #5eead4;
+  /* OBS pill text when LIVE. */
+  --live-fg: #86efac;
+}
+
+[data-theme='light'] {
+  --page:
+    radial-gradient(circle at 15% 10%, #f6d9ff 0%, rgba(246, 217, 255, 0) 40%),
+    radial-gradient(circle at 85% 85%, #d4ccff 0%, rgba(212, 204, 255, 0) 45%), #ece8fb;
+  --shell: rgba(255, 255, 255, 0.35);
+  --shell-border: rgba(255, 255, 255, 0.8);
+  --shell-shadow: 0 30px 70px rgba(91, 43, 224, 0.18);
+  --blur: blur(18px);
+  --side: rgba(255, 255, 255, 0.72);
+  --side-solid: #ffffff;
+  --right: rgba(255, 255, 255, 0.55);
+  --panel: rgba(255, 255, 255, 0.85);
+  --panel-solid: #ffffff;
+  --inset: rgba(255, 255, 255, 0.6);
+  --border: rgba(109, 61, 245, 0.14);
+  --card-border: rgba(255, 255, 255, 0.9);
+  --text: #1c1638;
+  --muted: #5f5980;
+  --accent: #6d3df5;
+  --on-accent: #ffffff;
+  --accent-text: #5b2be0;
+  --input-border: #8f86b8;
+  --pink: #c0267a;
+  --purple: #6d3df5;
+  --teal: #0e7c86;
+  --feature: radial-gradient(circle at 80% 20%, #c13af0 0%, rgba(193, 58, 240, 0) 50%), #2a0f8c;
+  --ring: conic-gradient(from 210deg, #6d3df5, #c13af0, #b9a3ff, #4b1fd1, #6d3df5);
+  --ring-glow: 0 0 22px rgba(109, 61, 245, 0.35);
+  --initials: #5b2be0;
+  --badge: linear-gradient(135deg, #6d3df5, #a43ae8);
+  --accent-line: rgba(109, 61, 245, 0.3);
+  --profile-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(246, 240, 255, 0.85));
+  --avatar-bg: #ffffff;
+  --profile-head: linear-gradient(
+    135deg,
+    rgba(109, 61, 245, 0.14),
+    rgba(193, 58, 240, 0.06) 60%,
+    rgba(255, 255, 255, 0) 90%
+  );
+  /* Sidebar items: light = solid violet + white text when selected. */
+  --nav-bg: rgba(255, 255, 255, 0.7);
+  --nav-bg-on: #6d3df5;
+  --nav-fg: #5f5980;
+  --nav-fg-on: #ffffff;
+  --live-fg: #15803d;
+}
+
+/* Fixed colours (section 2). */
+:root {
+  --live: #22c55e;
+  --go-live: #16a34a;
+  --danger: #dc2626;
+  --power: #f87171;
+  --offline: #8a8f98;
+  --focus: #8b5cf6;
+  --font-ui: 'Poppins', 'Hind Siliguri', 'Noto Sans Bengali', system-ui, sans-serif;
+}
+
+html,
+body {
+  font-family: var(--font-ui);
+  color: var(--text);
+}
+
+body {
+  background: var(--page);
+  background-attachment: fixed;
+}
+
+/* Bengali text: Hind Siliguri first (section 0). */
+:lang(bn) {
+  font-family: 'Poppins', 'Hind Siliguri', 'Noto Sans Bengali', system-ui, sans-serif;
+}
+
+/* ---- Depth classes (section 3, reference <style>) ---- */
+.as-btn {
+  transition:
+    transform 0.15s,
+    box-shadow 0.2s,
+    background 0.2s;
+}
+.as-btn:focus-visible,
+.as-in:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.as-btn:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.55;
+}
+
+[data-theme='dark'] .as-btn {
+  border-color: transparent !important;
+  box-shadow:
+    7px 7px 15px #0f1013,
+    -5px -5px 12px #363940,
+    inset 1px 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+[data-theme='dark'] .as-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow:
+    11px 11px 22px #0c0d10,
+    -7px -7px 16px #3a3d44,
+    inset 1px 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+[data-theme='dark'] .as-btn:active:not(:disabled),
+[data-theme='dark'] .as-btn.as-on {
+  transform: none;
+  box-shadow:
+    inset 6px 6px 12px #121316,
+    inset -5px -5px 10px #34373e !important;
+}
+[data-theme='dark'] .as-raise {
+  box-shadow:
+    12px 12px 26px #101114,
+    -8px -8px 20px #33363c;
+}
+[data-theme='dark'] .as-sink {
+  box-shadow:
+    inset 6px 6px 14px #131417,
+    inset -6px -6px 14px #2f3238;
+}
+
+[data-theme='light'] .as-btn {
+  box-shadow:
+    0 10px 24px rgba(91, 43, 224, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+}
+[data-theme='light'] .as-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow:
+    0 16px 32px rgba(91, 43, 224, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+}
+[data-theme='light'] .as-btn:active:not(:disabled),
+[data-theme='light'] .as-btn.as-on {
+  transform: none;
+  box-shadow: inset 0 3px 9px rgba(60, 20, 160, 0.28) !important;
+}
+[data-theme='light'] .as-raise {
+  box-shadow:
+    0 16px 36px rgba(91, 43, 224, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+[data-theme='light'] .as-sink {
+  box-shadow: inset 0 2px 8px rgba(91, 43, 224, 0.12);
+}
+
+/* Glass blur (light theme). */
+.as-glass {
+  backdrop-filter: var(--blur);
+}
+
+.as-live {
+  animation: aslive 1.4s ease-in-out infinite;
+}
+@keyframes aslive {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 9px rgba(34, 197, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+.as-range {
+  width: 100%;
+  accent-color: var(--focus);
+}
+
+/*
+ * Settings → "Reduce effects" (section 3, for 4 GB / no-GPU PCs): no backdrop blur,
+ * no hover lift, no pulsing. The same applies when Windows asks for reduced motion.
+ */
+[data-reduce-effects='true'] *,
+[data-reduce-effects='true'] *::before,
+[data-reduce-effects='true'] *::after {
+  backdrop-filter: none !important;
+  animation: none !important;
+}
+[data-reduce-effects='true'] .as-btn:hover {
+  transform: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .as-btn,
+  .as-btn:hover {
+    transform: none !important;
+    transition: none !important;
+  }
+  .as-live {
+    animation: none;
+  }
+}
