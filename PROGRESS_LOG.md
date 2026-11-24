@@ -63,3 +63,16 @@ Claude Code প্রতিটা Phase শেষে এখানে একট�
 - Phase 4: manual test passed by user (2026-11-24) — Bangla and English documents edited and exported.
 - Phase 5: manual test passed by user (2026-11-24) — document shown in a video call through OBS Window Capture + Virtual Camera.
 - Spec checklist: Phase 4 and Phase 5 ticked.
+
+## Phase 1 — Remaining pose tests + Report (2026-11-24)
+- `pose-test.mjs` got an optional 3rd argument (case-name prefixes) so only missing cases are sent.
+- Run of 08–12 (eyes up/down, eyes closed, mouth smile/open): first call failed with "exceeded your free ZeroGPU quota"; tried once only, as instructed. Still 8/12.
+- Written: `docs/PHASE1_REPORT.md` (latency, quality, Replicate cost, ToS/License, conditional Go recommendation). Phase 6 not started — waiting for the user's decision.
+- Open issues: 4 tests pending (needs HF quota reset or a Replicate key); test on a photoreal face still missing.
+
+## Fix — Phase 4 open issues: EXIF rotation + long text fit (2026-11-24)
+- EXIF: tesseract.js only detects big-endian ("MM") EXIF orientation in the first 500 bytes, while `createImageBitmap` applies every orientation, so little-endian ("II") phone JPEGs got OCR boxes in the wrong (unrotated) coordinates. New `src/editor/exif.ts` (`readJpegOrientation`); when orientation ≠ 1, OCR now gets the decoded, already-upright pixels as PNG. `decode` sets `imageOrientation: 'from-image'` explicitly.
+- Text fit: `fitFontSize` in `render.ts` shrinks the drawn size so the widest line fits the box width and all lines fit the box height (min 6 px, never larger than the layer size). The layer keeps its size; only drawing changes (preview, Save, Export, Webcam Output).
+- Tests: new `exif.test.ts` (II/MM, APP0 first, broken/truncated/PNG) and `fitFontSize` tests.
+- Manual test for user: open a phone photo taken in portrait (JPEG) → OCR boxes sit on the text. Type a much longer text into a box → Apply → it stays inside the box (smaller).
+- Open issues: documents saved earlier from such rotated JPEGs keep their old (wrong) OCR boxes; open the image again as a new document.

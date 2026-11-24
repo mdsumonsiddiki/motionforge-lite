@@ -357,7 +357,7 @@ Multi-Scene/Multi-Human, Digital Twin, VR/AR, AI World Generator, AI Acting, Vir
 
 ### Progress Checklist
 - [x] Phase 0 — Setup
-- [ ] Phase 1 — Cloud Pose Feasibility (আংশিক: 8/12 test)
+- [ ] Phase 1 — Cloud Pose Feasibility (আংশিক: 8/12 test; Report: `docs/PHASE1_REPORT.md`, User-এর Go/No-Go সিদ্ধান্ত বাকি)
 - [x] Phase 2 — App Shell
 - [x] Phase 3 — Storage/Backup
 - [x] Phase 4 — Document Editor (manual test passed by user, 2026-11-24)
