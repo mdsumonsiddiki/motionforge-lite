@@ -19,5 +19,8 @@ release/
 .DS_Store
 Thumbs.db
 
+# Editor settings
+.vscode/
+
 # Local Claude Code settings
 .claude/settings.local.json

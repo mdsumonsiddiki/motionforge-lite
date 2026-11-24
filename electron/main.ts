@@ -1,10 +1,12 @@
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { join } from 'node:path'
+import { IPC } from './shared/ipc'
+import { registerSettingsIpc } from './ipc/settings'
 
 /**
  * Creates the main application window.
  * Security: contextIsolation on, nodeIntegration off, sandboxed renderer.
- * All file access and cloud calls will go through IPC (added in later phases).
+ * All file access and cloud calls go through IPC.
  */
 function createMainWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -31,6 +33,8 @@ function createMainWindow(): BrowserWindow {
     return { action: 'deny' }
   })
 
+  setupCloseConfirmation(win)
+
   // electron-vite sets ELECTRON_RENDERER_URL in dev mode.
   const devUrl = process.env['ELECTRON_RENDERER_URL']
   if (!app.isPackaged && devUrl) {
@@ -42,7 +46,35 @@ function createMainWindow(): BrowserWindow {
   return win
 }
 
+/**
+ * App close confirmation (spec section 6).
+ * The first close is cancelled and the renderer is asked to show a translated
+ * confirm dialog. When the user confirms, the renderer sends `appConfirmClose`
+ * and the window closes for real.
+ */
+function setupCloseConfirmation(win: BrowserWindow): void {
+  let closeConfirmed = false
+  let rendererGone = false
+  win.webContents.on('render-process-gone', () => (rendererGone = true))
+
+  win.on('close', (event) => {
+    // If the renderer is gone it cannot show the dialog, so just close.
+    if (closeConfirmed || rendererGone) return
+    event.preventDefault()
+    win.webContents.send(IPC.appCloseRequested)
+  })
+
+  const onConfirm = (event: Electron.IpcMainEvent): void => {
+    if (event.sender !== win.webContents) return
+    closeConfirmed = true
+    win.close()
+  }
+  ipcMain.on(IPC.appConfirmClose, onConfirm)
+  win.on('closed', () => ipcMain.off(IPC.appConfirmClose, onConfirm))
+}
+
 app.whenReady().then(() => {
+  registerSettingsIpc()
   createMainWindow()
 
   app.on('activate', () => {

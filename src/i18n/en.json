@@ -1,5 +1,49 @@
 {
   "app": {
     "name": "MotionForge Lite"
+  },
+  "nav": {
+    "back": "Back to Dashboard",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "human": "Human Studio",
+    "humanDesc": "Create and control a photoreal digital human",
+    "document": "Document Editor",
+    "documentDesc": "Edit text and images in document photos",
+    "output": "Webcam Output",
+    "outputDesc": "Show a Human or Document in a window for OBS"
+  },
+  "pages": {
+    "comingSoon": "This section will be built in a later phase."
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "languageEn": "English",
+    "languageBn": "বাংলা",
+    "theme": "Theme",
+    "themeDark": "Dark",
+    "themeLight": "Light",
+    "obsPath": "OBS Path",
+    "obsPathHint": "Path to obs64.exe (OBS Studio 28 or newer).",
+    "obsBrowse": "Browse…",
+    "obsDetect": "Auto-detect",
+    "obsBrowseTitle": "Select obs64.exe"
+  },
+  "close": {
+    "title": "Close MotionForge Lite?",
+    "message": "Are you sure you want to close the app?",
+    "confirm": "Close",
+    "cancel": "Cancel"
+  },
+  "toast": {
+    "dismiss": "Dismiss",
+    "generationComplete": "Generation complete"
+  },
+  "errors": {
+    "settingsLoad": "Could not load settings. Defaults are used.",
+    "settingsSave": "Could not save settings.",
+    "obsNotFound": "OBS Studio was not found. Please select obs64.exe manually."
   }
 }

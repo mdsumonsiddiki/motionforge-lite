@@ -29,29 +29,16 @@ Rules:
 - Never change the user's global git config without asking.
 
 ## Workflow for every phase
-The user watches progress from the phone (Claude app Remote Control + GitHub app), so work in **small steps** and push each one with a screenshot.
-
 1. Read the spec section for the phase and `PROGRESS_LOG.md`.
-2. Split the phase into **small steps** (one visible feature or one logic unit each, e.g. "Dashboard buttons", "Theme switch", "Settings: language"). Show the numbered step list to the user in Bangla.
-3. **For each step:**
-   1. Implement it. Clean code with clear comments.
-   2. Run `npm run typecheck`, `npm test` and `npm run build`. Fix failures (max 3 rounds, then stop and report).
-   3. If the step changes anything visible, run `npm run screenshot -- <phase>-<NN>-<short-name>` (see "Step screenshots").
-   4. Commit: `git commit -m "Phase N step NN: <short description>"`, then `git push origin main`.
-   5. Tell the user in 1–2 Bangla lines: step done, and the screenshot path.
-4. **End of phase:** delegate to the `tester` subagent (full check incl. lint), then the `spec-reviewer`. Fix real issues (max 3 rounds).
-5. Check every "Done when" item of the phase.
-6. Update the spec checklist and `PROGRESS_LOG.md` (list every step with its screenshot path), commit `Phase N: <title> complete`, and push.
-7. Before any push, confirm `git status --ignored` shows `.env`, `node_modules`, `out/`, `.tmp/` are not tracked. Never push code that fails typecheck/test/build. If a push fails, report and stop (never force-push).
-8. Report to the user in Bangla: what was done, test results, the GitHub link to `docs/screenshots/phase-N/`, how to test it manually, anything that needs the user.
-
-## Step screenshots (live-ish preview for the phone)
-- One-time setup (do it in the current phase if missing): add `playwright-core` as a devDependency and create `scripts/screenshot.mjs`, plus the npm script `"screenshot": "node scripts/screenshot.mjs"`.
-- `scripts/screenshot.mjs <name>`: launch the **built** app with Playwright's `_electron.launch({ args: ['.'] })`, wait for the first window to finish loading, set the window to 1280×800, wait 1 second, save `docs/screenshots/phase-<N>/<name>.png`, close the app. Exit with an error if the window never appears (30 s timeout).
-- Optional second argument: a route or UI state to open first (e.g. `settings`, `dark`), so one step can show the screen it changed.
-- Screenshots are committed and pushed, so the user can open them in the GitHub app. Keep them small (PNG, 1280×800 only).
-- Steps with no visible change (pure logic, storage, IPC) skip the screenshot; say "no UI change" in the step message.
-- Phase 1 sample images from the cloud test also go in `docs/screenshots/phase-1/`.
+2. Write a short plan (files to create/change, tests to add) and show it to the user in Bangla.
+3. Implement in small steps. Clean code with clear comments.
+4. Delegate verification to the `tester` subagent. Fix failures and re-test, at most 3 rounds. If it still fails, stop and report.
+5. Delegate a spec check to the `spec-reviewer` subagent. Fix real issues.
+6. Check every "Done when" item of the phase.
+7. Update the spec checklist and `PROGRESS_LOG.md`, then `git add -A` and `git commit -m "Phase N: <title>"`.
+8. **Push to GitHub** only if the tester reported PASS: `git push origin main`. Before pushing, run `git status --ignored` and confirm `.env`, `node_modules` and build output are not tracked. If the push fails, report the error and stop (never force-push).
+9. Report to the user in Bangla: what was done, test results, push status (commit link if possible), how to test it manually, anything that needs the user.
+- No screenshots: do not add Playwright or a screenshot script.
 
 ## GitHub
 - Remote: `origin`, branch `main`, **private** repository.
@@ -83,7 +70,7 @@ The user watches progress from the phone (Claude app Remote Control + GitHub app
 - Heavy work (OCR, inpaint) runs in Web Workers, never on the UI thread.
 - Tests: Vitest for logic (storage, backup, command validation/clamp, pose cache, OBS path detection). Keep tests fast.
 - `.gitignore` must also contain `*.tsbuildinfo` and `.tmp/`.
-- Every step commit: `npm run typecheck`, `npm test`, `npm run build` must pass. Phase-end commit: also `npm run lint` and the `tester` subagent.
+- Commands that must pass before a commit: `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`.
 
 ## Secrets
 - API keys live in `.env` (development) or Electron `safeStorage` (app). Never print a key, never commit `.env` (it must be in `.gitignore`).
