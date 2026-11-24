@@ -7,8 +7,7 @@ import { SlotTabs } from '../components/document/SlotTabs'
 import { addImageLayer } from '../editor/edits'
 import { syncAssets } from '../editor/session'
 import type { Rect } from '../editor/types'
-import { isDirty, useActiveSlot, useDocumentStore } from '../store/documentStore'
-import { useNavStore } from '../store/navStore'
+import { useActiveSlot, useDocumentStore } from '../store/documentStore'
 import { notify } from '../store/toastStore'
 
 /** Max size of a replacement picture (it is embedded in edits.json as base64). */
@@ -31,14 +30,7 @@ export function DocumentEditor() {
   const { t } = useTranslation()
   const slot = useActiveSlot()
   const hasSlots = useDocumentStore((s) => s.slots.length > 0)
-  const setLeaveGuard = useNavStore((s) => s.setLeaveGuard)
   const [selectingArea, setSelectingArea] = useState(false)
-
-  // Warn before leaving this page with unsaved changes (spec section 5).
-  useEffect(() => {
-    setLeaveGuard(() => useDocumentStore.getState().slots.some(isDirty))
-    return () => setLeaveGuard(null)
-  }, [setLeaveGuard])
 
   // Ctrl+Z / Ctrl+Y (also Ctrl+Shift+Z). Text fields keep their own undo.
   useEffect(() => {

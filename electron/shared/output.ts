@@ -19,6 +19,17 @@ export const OUTPUT_FPS = 24
 /** Chroma key color for OBS (spec section 10). */
 export const GREEN_SCREEN = '#00ff00'
 
+/** Fill around the document for the "Original" background (user decision: white). */
+export const ORIGINAL_BACKGROUND = '#ffffff'
+
+/**
+ * Base fill color of an output frame. Green Screen uses the chroma key color; Original uses
+ * white. Custom is drawn over this fill, so white also shows while the picture is loading.
+ */
+export function backgroundFill(background: OutputBackground | undefined): string {
+  return background === 'green' ? GREEN_SCREEN : ORIGINAL_BACKGROUND
+}
+
 /** Window title OBS users pick in "Window Capture" (kept in English on purpose). */
 export const OUTPUT_WINDOW_TITLE = 'MotionForge Lite Output'
 

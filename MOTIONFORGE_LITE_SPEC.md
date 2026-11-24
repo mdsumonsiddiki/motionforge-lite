@@ -119,7 +119,8 @@ userData/
 ```
 
 - **Uninstall করলেও userData মুছবে না** (`deleteAppDataOnUninstall: false`)।
-- Auto Save নেই। শুধু Save Button চাপলে Save হবে। Unsaved Change থাকলে Page ছাড়ার আগে সতর্ক করবে।
+- Auto Save নেই। শুধু Save Button চাপলে Save হবে। Unsaved Change থাকলে Tab (Document) বা App বন্ধ করার আগে সতর্ক করবে।
+  - User-এর সিদ্ধান্ত (2026-11-24): Page বদলালে সতর্কবার্তা দেখাবে না (খোলা Document হারায় না)। শুধু Tab বা App বন্ধ করার সময় দেখাবে।
 - Delete আর Restore করার আগে Confirmation চাইবে।
 - **Backup** = `characters/` + `documents/` + `settings.json` মিলিয়ে একটা `.zip` (API Key Backup-এ যাবে না)। Backup কোথায় রাখবে, User Folder বেছে দেবে।
 
@@ -252,6 +253,7 @@ interface PoseRenderer     { render(base: Buffer, state: CharacterState): Promis
 - Human Mode: Human Studio-র বর্তমান Character আর State Live দেখাবে।
 - Document Mode: খোলা সর্বোচ্চ ৩টি Document-এর মধ্যে কোনটা দেখাবে, সেটা Switch করা যাবে। Zoom In/Out, Up/Down/Left/Right আর Reset Position থাকবে।
 - Background: **Original / Green Screen (#00FF00) / Custom Image**।
+  - User-এর সিদ্ধান্ত (2026-11-24): Original-এ Document-এর চারপাশ **সাদা (#FFFFFF)** দেখাবে।
 
 ### OBS
 - Settings-এ OBS Path থাকবে (Default: `C:\Program Files\obs-studio\bin\64bit\obs64.exe`, Auto-detect করার চেষ্টা করবে)।

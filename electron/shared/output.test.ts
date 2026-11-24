@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  backgroundFill,
   contentRect,
   coverRect,
   DEFAULT_VIEW,
@@ -55,5 +56,18 @@ describe('output layout', () => {
   it('sizes the window to fit the screen, keeping the aspect ratio', () => {
     expect(fitWindowSize('landscape', { width: 1920, height: 1040 })).toEqual({ width: 1280, height: 720 })
     expect(fitWindowSize('portrait', { width: 1920, height: 1040 })).toEqual({ width: 468, height: 832 })
+  })
+})
+
+describe('backgroundFill', () => {
+  it('uses white around the document for Original', () => {
+    expect(backgroundFill('original')).toBe('#ffffff')
+  })
+  it('uses the chroma key green for Green Screen', () => {
+    expect(backgroundFill('green')).toBe('#00ff00')
+  })
+  it('uses white under a Custom picture and before any state arrives', () => {
+    expect(backgroundFill('custom')).toBe('#ffffff')
+    expect(backgroundFill(undefined)).toBe('#ffffff')
   })
 })

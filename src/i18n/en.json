@@ -92,13 +92,13 @@
     "slotCount": "{{count}} / {{max}} open",
     "unsavedTitle": "Unsaved changes",
     "closeUnsavedMessage": "\"{{name}}\" has changes that are not saved. Close it anyway?",
-    "closeAnyway": "Close without saving",
-    "leaveUnsavedMessage": "Some open documents have changes that are not saved. Leave this page anyway?",
-    "leaveAnyway": "Leave"
+    "closeAnyway": "Close without saving"
   },
   "close": {
     "title": "Close MotionForge Lite?",
     "message": "Are you sure you want to close the app?",
+    "unsavedMessage": "Some open documents have changes that are not saved. Close the app anyway?",
+    "closeWithoutSaving": "Close without saving",
     "confirm": "Close",
     "cancel": "Cancel"
   },

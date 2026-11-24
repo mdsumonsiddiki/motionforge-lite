@@ -5,6 +5,7 @@ import {
   fitWindowSize,
   OUTPUT_SIZE,
   OUTPUT_WINDOW_TITLE,
+  ORIGINAL_BACKGROUND,
   type Orientation,
   type OutputState
 } from '../shared/output'
@@ -47,7 +48,8 @@ function createOutputWindow(orientation: Orientation, devUrl: string | undefined
     maximizable: false,
     fullscreenable: false,
     autoHideMenuBar: true,
-    backgroundColor: '#000000',
+    // Same as the "Original" output background, so there is no dark flash before the first frame.
+    backgroundColor: ORIGINAL_BACKGROUND,
     show: false,
     webPreferences: {
       preload: join(__dirname, '../preload/preload.js'),

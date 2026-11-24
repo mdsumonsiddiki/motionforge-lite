@@ -92,13 +92,13 @@
     "slotCount": "{{count}} / {{max}} খোলা",
     "unsavedTitle": "Save না করা পরিবর্তন",
     "closeUnsavedMessage": "\"{{name}}\"-এ Save না করা পরিবর্তন আছে। তবুও বন্ধ করবেন?",
-    "closeAnyway": "Save না করে বন্ধ করুন",
-    "leaveUnsavedMessage": "কিছু খোলা Document-এ Save না করা পরিবর্তন আছে। তবুও এই Page ছাড়বেন?",
-    "leaveAnyway": "Page ছাড়ুন"
+    "closeAnyway": "Save না করে বন্ধ করুন"
   },
   "close": {
     "title": "MotionForge Lite বন্ধ করবেন?",
     "message": "আপনি কি নিশ্চিত যে App বন্ধ করতে চান?",
+    "unsavedMessage": "কিছু খোলা Document-এ Save না করা পরিবর্তন আছে। তবুও App বন্ধ করবেন?",
+    "closeWithoutSaving": "Save না করে বন্ধ করুন",
     "confirm": "বন্ধ করুন",
     "cancel": "বাতিল"
   },

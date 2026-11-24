@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
 import {
+  backgroundFill,
   contentRect,
   coverRect,
-  GREEN_SCREEN,
   OUTPUT_FPS,
   OUTPUT_SIZE,
   type OutputState
@@ -81,8 +81,8 @@ export function OutputApp() {
       if (canvas.width !== width) canvas.width = width
       if (canvas.height !== height) canvas.height = height
 
-      // Background: Original (black) / Green Screen / Custom picture.
-      ctx.fillStyle = state?.background === 'green' ? GREEN_SCREEN : '#000000'
+      // Background: Original (white) / Green Screen / Custom picture.
+      ctx.fillStyle = backgroundFill(state?.background)
       ctx.fillRect(0, 0, width, height)
       if (state?.background === 'custom' && background) {
         const r = coverRect(width, height, background.width, background.height)
@@ -105,7 +105,7 @@ export function OutputApp() {
   }, [])
 
   return (
-    <div className="flex h-full w-full items-center justify-center overflow-hidden bg-black">
+    <div className="flex h-full w-full items-center justify-center overflow-hidden bg-white">
       <canvas ref={canvasRef} className="h-full w-full object-contain" />
     </div>
   )
