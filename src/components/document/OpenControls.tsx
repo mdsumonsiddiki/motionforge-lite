@@ -1,21 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { OpenResult } from '../../store/documentStore'
 import { useLibraryStore } from '../../store/libraryStore'
 import { notify } from '../../store/toastStore'
 import { openImage, openSaved } from '../../editor/session'
-
-/** Maps an IPC error from main to a translated message key. */
-function openErrorKey(err: unknown): string {
-  const msg = err instanceof Error ? err.message : String(err)
-  if (msg.includes('IMAGE_TOO_LARGE')) return 'errors.imageTooLarge'
-  if (msg.includes('NOT_AN_IMAGE')) return 'errors.notAnImage'
-  return 'errors.openFailed'
-}
-
-function handleResult(result: OpenResult): void {
-  if (result.status === 'full') notify.error('errors.slotsFull')
-}
+import { handleOpenResult as handleResult, openErrorKey } from './openErrors'
 
 /** "Open image" and "Open saved document" controls. */
 export function OpenControls() {

@@ -148,3 +148,11 @@ Claude Code প্রতিটা Phase শেষে এখানে একট�
 - Change photo uses the existing image picker IPC (no new IPC). Backup tile uses the existing backup IPC (`useBackup` hook).
 - Tests: `shell/profile.test.ts` (default name, initials incl. Bangla, photo downscale size), settings validation for name / photo, settings round trip, backup restores the profile. typecheck ✅ lint ✅ test ✅ (190) build ✅.
 - Manual test for user: click the profile card → type a name → sidebar updates → restart → name kept; Change photo → pick a JPG → avatar shows the photo; Backup tile → choose folder → status line shows the zip path; collapse sidebar → only the avatar shows.
+
+## UI Redesign — Step 4: Home section (2026-11-25, branch `ui-redesign`)
+- `src/pages/home/Home.tsx` (center): "Hello, {name}" + subtitle; Continue Editing card (active / first open document with its thumbnail, "Document Editor · Slot N · All changes saved / Unsaved changes", Resume → editor, Send to Output → output shows that document; nothing open → newest saved document is opened on Resume; nothing at all → "Open your first document" with the image picker); Live Output card (mini 16:9 preview of the shown document + background, "Document · 720p" chip, status Offline); Getting Started (3 steps + progress bar; Go live stays open until LIVE detection exists); Library grid (saved documents open in the editor; "+ No characters yet" → Human Studio).
+- `src/pages/home/HomePanel.tsx` (right): Overview counts (saved documents purple, saved characters pink, editor slots n/3 teal) + "Back up your work" feature card → existing Backup (status line under the button).
+- Old Dashboard + SavedList removed. Deleting a saved document stays in the Document Editor (Delete button, with confirmation).
+- `BlobImage` shows image bytes via a blob URL that is revoked on change / unmount. `openErrors.ts`: open-error mapping shared by the editor and Home (moved, unchanged).
+- Tests: `pages/home/homeModel.test.ts` (continue target, getting-started steps). typecheck ✅ lint ✅ test ✅ (195) build ✅.
+- Manual test for user: start with no documents → "Open your first document" → pick a JPG → editor opens; back to Home → card shows the document + thumbnail + Slot 1; Send to Output → Webcam Output shows it; Back up now → choose folder → status shows the zip path.
