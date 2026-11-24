@@ -360,8 +360,8 @@ Multi-Scene/Multi-Human, Digital Twin, VR/AR, AI World Generator, AI Acting, Vir
 - [ ] Phase 1 — Cloud Pose Feasibility (আংশিক: 8/12 test)
 - [x] Phase 2 — App Shell
 - [x] Phase 3 — Storage/Backup
-- [ ] Phase 4 — Document Editor (code + tests done; manual "Done when" test by user pending)
-- [ ] Phase 5 — Output (Document) + OBS (code + tests done; manual OBS / Virtual Camera test by user pending)
+- [x] Phase 4 — Document Editor (manual test passed by user, 2026-11-24)
+- [x] Phase 5 — Output (Document) + OBS (manual OBS / Virtual Camera test passed by user, 2026-11-24)
 - [ ] Phase 6 — Cloud + Human Generation
 - [ ] Phase 7 — Character Control
 - [ ] Phase 8 — AI Text Command

@@ -58,3 +58,8 @@ Claude Code প্রতিটা Phase শেষে এখানে একট�
 - Unsaved warning: no longer shown when changing pages (open documents stay in memory). Shown only when closing a document tab or the app; the app close dialog now says when open documents have unsaved changes (user decision, recorded in spec section 5).
 - Tests: typecheck ✅ lint ✅ test ✅ (24 files, 114 tests: new `backgroundFill` tests, simplified nav test) build ✅ — tester PASS; spec-reviewer: no must-fix.
 - Manual test for user: Webcam Output → Background Original → white around the document. Edit a document, go to another page and back (no warning, edits kept). Close its tab (warning) / close the app (warning says there are unsaved changes).
+
+## Phase 4 + 5 — Manual test (2026-11-24)
+- Phase 4: manual test passed by user (2026-11-24) — Bangla and English documents edited and exported.
+- Phase 5: manual test passed by user (2026-11-24) — document shown in a video call through OBS Window Capture + Virtual Camera.
+- Spec checklist: Phase 4 and Phase 5 ticked.
