@@ -29,3 +29,8 @@ resources/opencv/
 
 # Local Claude Code settings
 .claude/settings.local.json
+
+# Local junk bin, stray vite temp configs, media files
+bin/
+electron.vite.config.ts.*.mjs
+*.mp4
