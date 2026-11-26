@@ -52,6 +52,15 @@ function contrast(a: Rgba, b: Rgba): number {
 
 const FOCUS: Rgba = [0x8b, 0x5c, 0xf6, 1]
 
+describe('fixed colours', () => {
+  const t = tokens(':root {')
+  it('white toast text is ≥ 4.5:1 on both toast backgrounds', () => {
+    for (const k of ['toast-ok', 'toast-error']) {
+      expect(contrast([255, 255, 255, 1], color(t[k] ?? '')), k).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+})
+
 for (const theme of ['dark', 'light'] as const) {
   describe(`${theme} theme tokens`, () => {
     const t = tokens(`[data-theme='${theme}']`)

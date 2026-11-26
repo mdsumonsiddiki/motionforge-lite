@@ -7,6 +7,8 @@ import { useDocumentStore } from '../store/documentStore'
 import { useLibraryStore } from '../store/libraryStore'
 import { useSettingsStore } from '../store/settingsStore'
 import { notify } from '../store/toastStore'
+import { Btn, Card, Muted } from '../shell/ui'
+import { fieldStyle } from '../shell/styles'
 
 /**
  * Settings page: Language, Theme, OBS Path, Backup / Restore.
@@ -20,8 +22,8 @@ export function Settings() {
   if (!settings) return null
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 p-8">
-      <h1 className="text-2xl font-semibold">{t('settings.title')}</h1>
+    <div style={{ width: '100%', maxWidth: 720, display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <h1 style={{ margin: 0, fontSize: 30, fontWeight: 700 }}>{t('settings.title')}</h1>
 
       <Field label={t('settings.language')}>
         <Segmented<Language>
@@ -117,26 +119,18 @@ function BackupRestore() {
     }
   }
 
-  const buttonClass =
-    'rounded-md border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100 disabled:opacity-50 dark:border-neutral-700 dark:hover:bg-neutral-800'
-
   return (
     <div>
-      <div className="flex gap-2">
-        <button type="button" disabled={busy} onClick={() => void backup()} className={buttonClass}>
+      <div style={{ display: 'flex', gap: 12 }}>
+        <Btn disabled={busy} onClick={() => void backup()} style={{ padding: '0 20px' }}>
           {t('backup.backup')}
-        </button>
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => setConfirmRestore(true)}
-          className={buttonClass}
-        >
+        </Btn>
+        <Btn disabled={busy} onClick={() => setConfirmRestore(true)} style={{ padding: '0 20px' }}>
           {t('backup.restore')}
-        </button>
+        </Btn>
       </div>
       {status && (
-        <p role="status" className="mt-2 text-sm break-all text-emerald-600 dark:text-emerald-400">
+        <p role="status" style={{ margin: '8px 0 0', fontSize: 13, color: 'var(--muted)', overflowWrap: 'anywhere' }}>
           {status}
         </p>
       )}
@@ -179,36 +173,36 @@ function ObsPathInput({
     else notify.error('errors.obsNotFound')
   }
 
-  const buttonClass =
-    'shrink-0 rounded-md border border-neutral-300 px-3 py-2 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800'
-
   return (
-    <div className="flex gap-2">
+    <div style={{ display: 'flex', gap: 10 }}>
       <input
+        className="as-in as-sink"
         type="text"
         value={draft}
         spellCheck={false}
+        aria-label={t('settings.obsPath')}
         onChange={(e) => setDraft(e.target.value)}
         onBlur={commit}
         onKeyDown={(e) => e.key === 'Enter' && commit()}
-        className="min-w-0 flex-1 rounded-md border border-neutral-300 bg-transparent px-3 py-2 font-mono text-sm"
+        style={{ ...fieldStyle, flex: 1, minWidth: 0, fontFamily: 'ui-monospace, Consolas, monospace' }}
       />
-      <button type="button" onClick={() => void browse()} className={buttonClass}>
+      <Btn onClick={() => void browse()} style={{ padding: '0 16px', flexShrink: 0 }}>
         {t('settings.obsBrowse')}
-      </button>
-      <button type="button" onClick={() => void detect()} className={buttonClass}>
+      </Btn>
+      <Btn onClick={() => void detect()} style={{ padding: '0 16px', flexShrink: 0 }}>
         {t('settings.obsDetect')}
-      </button>
+      </Btn>
     </div>
   )
 }
 
+/** One settings row as a raised card (UI_REDESIGN.md look). */
 function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
-    <div>
-      <div className="mb-2 text-sm font-medium">{label}</div>
+    <Card style={{ padding: 20, gap: 10 }}>
+      <h2 style={{ margin: 0, fontSize: 15, fontWeight: 600 }}>{label}</h2>
       {children}
-      {hint && <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">{hint}</p>}
-    </div>
+      {hint && <Muted>{hint}</Muted>}
+    </Card>
   )
 }

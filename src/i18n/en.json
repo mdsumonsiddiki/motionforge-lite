@@ -103,14 +103,6 @@
     "restartWithoutSaving": "Restart without saving",
     "outputWillClose": "The Output window will close too."
   },
-  "dashboard": {
-    "human": "Human Studio",
-    "humanDesc": "Create and control a photoreal digital human",
-    "document": "Document Editor",
-    "documentDesc": "Edit text and images in document photos",
-    "output": "Webcam Output",
-    "outputDesc": "Show a Human or Document in a window for OBS"
-  },
   "settings": {
     "title": "Settings",
     "language": "Language",
@@ -130,9 +122,6 @@
     "on": "On"
   },
   "library": {
-    "characters": "Saved Characters",
-    "documents": "Saved Documents",
-    "empty": "Nothing saved yet.",
     "delete": "Delete",
     "deleteTitle": "Delete this item?",
     "deleteMessage": "\"{{name}}\" will be permanently deleted."
@@ -165,7 +154,6 @@
     "exported": "Exported: {{file}}",
     "ocr": "Text recognition (OCR)",
     "ocrRunning": "Reading text… {{percent}}%",
-    "ocrDone": "{{count}} text lines found. Click a box on the image to edit it.",
     "retry": "Try again",
     "editText": "Edit text",
     "selectBoxHint": "Click a text box on the image to edit it.",

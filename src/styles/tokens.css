@@ -107,6 +107,9 @@
   --power: #f87171;
   --offline: #8a8f98;
   --focus: #8b5cf6;
+  /* Toast backgrounds (white text ≥ 4.5:1, checked in tokens.test.ts). */
+  --toast-ok: #15803d;
+  --toast-error: #dc2626;
   --font-ui: 'Poppins', 'Hind Siliguri', 'Noto Sans Bengali', system-ui, sans-serif;
 }
 

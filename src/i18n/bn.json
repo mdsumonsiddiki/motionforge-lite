@@ -103,14 +103,6 @@
     "restartWithoutSaving": "Save না করে আবার চালু করুন",
     "outputWillClose": "Output Window-ও বন্ধ হয়ে যাবে।"
   },
-  "dashboard": {
-    "human": "Human Studio",
-    "humanDesc": "Photoreal Digital Human তৈরি ও নিয়ন্ত্রণ",
-    "document": "Document Editor",
-    "documentDesc": "Document ছবির লেখা ও ছবি সম্পাদনা",
-    "output": "Webcam Output",
-    "outputDesc": "OBS-এর জন্য Human বা Document আলাদা Window-তে দেখান"
-  },
   "settings": {
     "title": "সেটিংস",
     "language": "ভাষা",
@@ -130,9 +122,6 @@
     "on": "চালু"
   },
   "library": {
-    "characters": "সংরক্ষিত Character",
-    "documents": "সংরক্ষিত Document",
-    "empty": "এখনো কিছু সংরক্ষণ করা হয়নি।",
     "delete": "মুছুন",
     "deleteTitle": "এটি মুছে ফেলবেন?",
     "deleteMessage": "\"{{name}}\" স্থায়ীভাবে মুছে যাবে।"
@@ -165,7 +154,6 @@
     "exported": "Export হয়েছে: {{file}}",
     "ocr": "লেখা শনাক্তকরণ (OCR)",
     "ocrRunning": "লেখা পড়া হচ্ছে… {{percent}}%",
-    "ocrDone": "{{count}}টি লাইন পাওয়া গেছে। Edit করতে ছবির ওপরের Box-এ Click করুন।",
     "retry": "আবার চেষ্টা করুন",
     "editText": "লেখা Edit",
     "selectBoxHint": "Edit করতে ছবির ওপরের একটা Text Box-এ Click করুন।",

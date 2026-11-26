@@ -13,9 +13,13 @@ export function Toaster() {
         <div
           key={toast.id}
           role={toast.kind === 'error' ? 'alert' : 'status'}
-          className={`pointer-events-auto flex items-start justify-between gap-3 rounded-lg px-4 py-3 text-sm text-white shadow-lg ${
-            toast.kind === 'error' ? 'bg-red-600' : 'bg-emerald-600'
-          }`}
+          className="pointer-events-auto flex items-start justify-between gap-3 px-4 py-3 text-sm"
+          style={{
+            borderRadius: 16,
+            color: '#ffffff',
+            background: toast.kind === 'error' ? 'var(--toast-error)' : 'var(--toast-ok)',
+            boxShadow: 'var(--shell-shadow)'
+          }}
         >
           <span>{t(toast.messageKey)}</span>
           <button

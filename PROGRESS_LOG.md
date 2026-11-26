@@ -180,3 +180,24 @@ Claude Code প্রতিটা Phase শেষে এখানে একট�
 - Old `PlaceholderPage` and the unused `pages.comingSoon` string removed. en + bn strings added.
 - typecheck ✅ lint ✅ test ✅ (197) build ✅.
 - Manual test for user: Human Studio → every control is greyed out and cannot be used; both themes.
+
+## UI Redesign — Step 8: i18n + contrast for both themes (2026-11-26, branch `ui-redesign`)
+- Session start: `git status` showed uncommitted step-8 work (Segmented + Settings re-skin, unused i18n keys removed). Verified the removed keys (`dashboard.*`, `library.characters/documents/empty`, `editor.ocrDone`) are not used anywhere, then finished the step. Stray files moved to `bin/` (git-ignored, commit 1c2fe19).
+- Settings page re-skinned (cards, `Btn`, sunken OBS path field with `aria-label`); `Segmented` uses the navbar segmented look (sunken track, selected = accent).
+- Toaster: old Tailwind `emerald-600` (white text 3.8:1, failed 4.5:1) replaced by fixed tokens `--toast-ok #15803d` / `--toast-error #dc2626`; contrast test added.
+- i18n: script check — every static `t()` key used in `src` exists in en + bn; `i18n.test.ts` (same keys, bn translated unless allow-listed, no empty strings) passes.
+- Tests: typecheck ✅ lint ✅ test ✅ (198) build ✅. Spec review: no issues.
+- Manual test list for steps 1–8: see "UI Redesign — manual test list" below.
+
+## UI Redesign — manual test list (steps 1–8)
+Run `npm run dev`. Do every check in **Dark** and **Light**, and in **EN** and **বাংলা** where text is shown.
+1. Theme & effects: Settings → Theme Light / Dark → whole app changes (Light = lavender glass, Dark = 3D). Font is Poppins; Bangla text uses Hind Siliguri. Settings → Reduce effects On → no blur, buttons don't lift on hover. Restart → theme and Reduce effects kept.
+2. Shell: window can't be made smaller than 1100×700; narrow window → right panel wraps under the center. ☰ collapses sidebar (244 → 88px, icons only) → restart → still collapsed. Sidebar items open Home / Human Studio / Document Editor / Webcam Output / Settings; selected item is sunken (dark) / purple (light). Navbar title shows the section name. Tab key → purple focus ring on every control.
+3. Language: navbar EN / বাংলা switches all text (sidebar, navbar, every section, dialogs, toasts) → restart → kept. No English left in বাংলা except app/page names, OBS, aspect ratios.
+4. Power: ⏻ → menu Restart app / Quit app. With an unsaved document → dialog asks about unsaved work → Restart without saving → app reopens. Output window open → Quit → warning mentions the Output window. OBS keeps running after Quit.
+5. Profile: click profile card → popover; type a name (max 24) → sidebar name, initials and "Hello, {name}" update → restart → kept. Change photo → JPG → avatar shows it. My Library / Backup tiles work; Shortcuts disabled "Coming soon". Footer shows app version; Done closes. Collapsed sidebar → avatar only. Backup → Restore → profile restored.
+6. Home: no documents → "Open your first document" → pick JPG → editor opens. Back to Home → Continue Editing shows thumbnail + "Slot 1"; Resume → editor; Send to Output → Webcam Output shows it. Live Output mini preview matches. Getting Started step 1 ticked. Library grid opens a saved document; "No characters yet" → Human Studio. Right panel counts correct; Back up now → zip path shown.
+7. Document Editor: tabs show open documents + "+ Open document" per free slot, "n / 3 open"; ✕ on a dirty tab asks first. Click a text box → Detected / textarea / Font / Apply works. Select area → drag → replace image. Undo / Redo (Ctrl+Z / Ctrl+Y), Export PNG / JPG, Save, Delete (with confirm) — all as before.
+8. Webcam Output: preview shows the document; Original / Green / Custom → preview + chip change; zoom / arrows / reset move the preview like the Output window; 16:9 / 9:16; Open / Close output window. Launch OBS → pill "OBS · Running" within ~3 s; Close OBS → "OBS · Offline". Human source and Go Live are disabled "Coming soon".
+9. Human Studio: every control greyed out with "Coming soon (Phase 6–8)"; "Saved characters: N" chip correct.
+10. Settings & toasts: Settings cards readable in both themes; OBS path Browse / Auto-detect work; Backup / Restore work. Success toast (green) and error toast (red) text is easy to read; ✕ dismisses.
